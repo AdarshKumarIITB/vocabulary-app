@@ -1,0 +1,6 @@
+sqlalchemy
+openai
+slack-sdk
+python-dotenv
+schedule
+flask
