@@ -4,26 +4,84 @@ Vocabulary Tutor Application Entry Point
 Production-ready with comprehensive error handling
 """
 
-import sys
-import signal
-import logging
-import threading
-import schedule
-import time
-from datetime import datetime
-from flask import Flask, request, jsonify
-from logging.handlers import RotatingFileHandler
-import io,os
+print("🔍 DEBUG: Script started")
 
-# Import all components
-from config.settings import load_config
-from database.database import create_engine_and_session, init_database, test_connection
-from database.models import cleanup_old_events
-from llm_backend.main import initialize_application, webhook_handler, cleanup_old_data
-from llm_backend.orchestrator import schedule_daily_word, setup_theme_thread
+import sys
+print("🔍 DEBUG: sys imported")
+
+import signal
+print("🔍 DEBUG: signal imported")
+
+import logging
+print("🔍 DEBUG: logging imported")
+
+import threading
+print("🔍 DEBUG: threading imported")
+
+import schedule
+print("🔍 DEBUG: schedule imported")
+
+import time
+print("🔍 DEBUG: time imported")
+
+from datetime import datetime
+print("🔍 DEBUG: datetime imported")
+
+from flask import Flask, request, jsonify
+print("🔍 DEBUG: Flask imported")
+
+from logging.handlers import RotatingFileHandler
+print("🔍 DEBUG: RotatingFileHandler imported")
+
+import io, os
+print("🔍 DEBUG: io, os imported")
+
+# Import all components - ADD DEBUGGING HERE
+print("🔍 DEBUG: About to import config.settings...")
+try:
+    from config.settings import load_config
+    print("🔍 DEBUG: ✅ config.settings imported successfully")
+except Exception as e:
+    print(f"🔍 DEBUG: ❌ config.settings import failed: {e}")
+    sys.exit(1)
+
+print("🔍 DEBUG: About to import database.database...")
+try:
+    from database.database import create_engine_and_session, init_database, test_connection
+    print("🔍 DEBUG: ✅ database.database imported successfully")
+except Exception as e:
+    print(f"🔍 DEBUG: ❌ database.database import failed: {e}")
+    sys.exit(1)
+
+print("🔍 DEBUG: About to import database.models...")
+try:
+    from database.models import cleanup_old_events
+    print("🔍 DEBUG: ✅ database.models imported successfully")
+except Exception as e:
+    print(f"🔍 DEBUG: ❌ database.models import failed: {e}")
+    sys.exit(1)
+
+print("🔍 DEBUG: About to import llm_backend.main...")
+try:
+    from llm_backend.main import initialize_application, webhook_handler, cleanup_old_data
+    print("🔍 DEBUG: ✅ llm_backend.main imported successfully")
+except Exception as e:
+    print(f"🔍 DEBUG: ❌ llm_backend.main import failed: {e}")
+    sys.exit(1)
+
+print("🔍 DEBUG: About to import llm_backend.orchestrator...")
+try:
+    from llm_backend.orchestrator import schedule_daily_word, setup_theme_thread
+    print("🔍 DEBUG: ✅ llm_backend.orchestrator imported successfully")
+except Exception as e:
+    print(f"🔍 DEBUG: ❌ llm_backend.orchestrator import failed: {e}")
+    sys.exit(1)
+
+print("🔍 DEBUG: All imports completed successfully!")
 
 # Setup logging
 def setup_logging():
+    print("🔍 DEBUG: setup_logging() called")
     """Configure comprehensive logging with Unicode support"""
     # Fix for Windows console encoding issues
     if sys.platform == 'win32':
@@ -75,19 +133,30 @@ def setup_logging():
     root_logger.addHandler(file_handler)
     root_logger.addHandler(error_handler)
     
+    print("🔍 DEBUG: setup_logging() completed")
     return root_logger
 
+print("🔍 DEBUG: About to call setup_logging()...")
 logger = setup_logging()
+print("🔍 DEBUG: Logger setup completed")
+
+print("Hello from vocabulary-app!")
 
 # Flask app for webhooks
 app = Flask(__name__)
 app.config['JSON_SORT_KEYS'] = False
+
+print("🔍 DEBUG: Flask app created")
 
 # Global variables for graceful shutdown
 shutdown_flag = threading.Event()
 scheduler_thread = None
 cleanup_thread = None
 app_components = {}
+
+print("🔍 DEBUG: Global variables initialized")
+
+print("🔍 DEBUG: About to define route handlers...")
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -96,7 +165,7 @@ def health_check():
         # Check database connection
         db_healthy = test_connection(app_components.get('engine'))
         
-        # Check Slack connection (you could ping Slack API here)
+        # Check Slack connection
         slack_healthy = app_components.get('slack_client') is not None
         
         if db_healthy and slack_healthy:
@@ -157,6 +226,11 @@ def slack_events():
         logger.error(f"Webhook processing failed: {e}", exc_info=True)
         return jsonify({'error': 'Internal server error'}), 500
 
+print("🔍 DEBUG: Route handlers defined")
+
+# (Other functions: run_scheduler, run_cleanup, handle_shutdown, test_fresh_init, etc.)
+# For brevity, assume these functions are defined here similar to your existing implementation.
+
 def run_scheduler():
     """Run the scheduler in a separate thread"""
     logger.info("Scheduler thread started")
@@ -167,7 +241,7 @@ def run_scheduler():
             time.sleep(1)
         except Exception as e:
             logger.error(f"Scheduler error: {e}", exc_info=True)
-            time.sleep(5)  # Wait before retrying
+            time.sleep(5)
             
     logger.info("Scheduler thread stopped")
 
@@ -177,38 +251,27 @@ def run_cleanup():
     
     while not shutdown_flag.is_set():
         try:
-            # Run cleanup every hour
             cleanup_old_data()
-            
-            # Sleep for an hour, but check shutdown flag every second
             for _ in range(3600):
                 if shutdown_flag.is_set():
                     break
                 time.sleep(1)
-                
         except Exception as e:
             logger.error(f"Cleanup error: {e}", exc_info=True)
-            time.sleep(300)  # Wait 5 minutes before retrying
+            time.sleep(300)
             
     logger.info("Cleanup thread stopped")
 
 def handle_shutdown(signum, frame):
     """Gracefully handle shutdown signals"""
     logger.info(f"Received signal {signum}, initiating graceful shutdown...")
-    
-    # Set shutdown flag
     shutdown_flag.set()
-    
-    # Wait for threads to finish (with timeout)
     if scheduler_thread and scheduler_thread.is_alive():
         scheduler_thread.join(timeout=5)
-        
     if cleanup_thread and cleanup_thread.is_alive():
         cleanup_thread.join(timeout=5)
-    
     logger.info("Shutdown complete")
     sys.exit(0)
-
 
 def test_fresh_init():
     """Test command for fresh initialization workflow"""
@@ -216,24 +279,17 @@ def test_fresh_init():
     from llm_backend.main import initialize_application
     from database.models import clear_all_data, check_if_database_empty
     
-    # Initialize components
     app_components = initialize_application()
     slack_client = app_components['slack_client']
     session_maker = app_components['db_session']
 
     with session_maker() as session:
-        # Clear database
         print("Clearing database...")
         clear_all_data(session)
-        
-        # Verify empty
         if check_if_database_empty(session):
             print("Database cleared successfully")
-            
-            # Run fresh initialization
             print("Running fresh initialization workflow...")
             success = initialize_fresh_database(session, slack_client)
-            
             if success:
                 print("✅ Fresh initialization complete!")
                 print("- Theme thread created with default 'Literature' theme")
@@ -244,7 +300,7 @@ def test_fresh_init():
             print("Failed to clear database")
 
 def main():
-    """Main entry point with fresh initialization check"""
+    print("🔍 DEBUG: ✨ main() function called!")
     global scheduler_thread, cleanup_thread, app_components
 
     try:
@@ -282,7 +338,6 @@ def main():
             return
 
         print("🚀 STEP 7: About to check database...")
-        # Fresh initialization check
         db_session = app_components['db_session']
         slack_client = app_components['slack_client']
         
@@ -300,7 +355,6 @@ def main():
                     print("🚀 STEP 10: Fresh initialization completed")
                 else:
                     print("🚀 STEP 9: Existing database - ensuring theme thread exists")
-                    # For an existing database, ensure the theme thread exists
                     setup_theme_thread(session, slack_client)
                     print("🚀 STEP 10: Theme thread setup completed")
         except Exception as db_error:
@@ -309,24 +363,20 @@ def main():
             return
 
         print("🚀 STEP 11: Setting up signal handlers...")
-        # Setup signal handlers
         signal.signal(signal.SIGINT, handle_shutdown)
         signal.signal(signal.SIGTERM, handle_shutdown)
 
         print("🚀 STEP 12: Starting scheduler thread...")
-        # Start scheduler thread
         logger.info("Starting scheduler thread...")
         scheduler_thread = threading.Thread(target=run_scheduler, daemon=False)
         scheduler_thread.start()
 
         print("🚀 STEP 13: Starting cleanup thread...")
-        # Start cleanup thread
         logger.info("Starting cleanup thread...")
         cleanup_thread = threading.Thread(target=run_cleanup, daemon=False)
         cleanup_thread.start()
 
         print("🚀 STEP 14: Scheduling daily word posting...")
-        # Schedule daily word posting
         config = app_components['config']
         daily_time = config.get('daily_word_time', '09:00')
         schedule.every().day.at(daily_time).do(
@@ -338,7 +388,6 @@ def main():
         logger.info(f"Scheduled daily word posting at {daily_time}")
 
         print("🚀 STEP 15: Starting Flask server...")
-        # Start Flask server
         import os
         port = int(os.getenv('PORT', 3000))
         print(f"🚀 STEP 16: About to start Flask on port {port}")
@@ -347,9 +396,9 @@ def main():
         app.run(
             host='0.0.0.0',
             port=port,
-            debug=False,  # Never use debug=True in production
-            threaded=True,  # Handle concurrent requests
-            use_reloader=False  # Prevent double initialization
+            debug=False,
+            threaded=True,
+            use_reloader=False
         )
         
         print("🚀 STEP 17: Flask server started successfully!")
@@ -364,87 +413,13 @@ def main():
         logger.error(f"Fatal error in main: {e}", exc_info=True)
         sys.exit(1)
 
-
-# def main():
-#     """Main entry point with fresh initialization check"""
-#     global scheduler_thread, cleanup_thread, app_components
-
-#     try:
-#         logger.info("=" * 50)
-#         logger.info("Starting Vocabulary Tutor Application")
-#         logger.info("=" * 50)
-
-#         # Initialize all components
-#         logger.info("Initializing application components...")
-#         app_components = initialize_application()
-
-#         if not app_components:
-#             logger.error("Failed to initialize application")
-#             sys.exit(1)
-#         from llm_backend.orchestrator import initialize_fresh_database
-#         from database.models import check_if_database_empty
-#         # Fresh initialization check
-#         db_session = app_components['db_session']
-#         slack_client = app_components['slack_client']
-#         with db_session() as session:
-#             if check_if_database_empty(session):
-#                 logger.info("Fresh database detected - running initialization workflow")
-#                 success = initialize_fresh_database(session, slack_client)
-#                 if not success:
-#                     logger.error("Fresh initialization failed")
-#                     return
-#             else:
-#                 # For an existing database, ensure the theme thread exists
-#                 setup_theme_thread(session, slack_client)
-
-#         # Setup signal handlers
-#         signal.signal(signal.SIGINT, handle_shutdown)
-#         signal.signal(signal.SIGTERM, handle_shutdown)
-
-#         # Start scheduler thread
-#         logger.info("Starting scheduler thread...")
-#         scheduler_thread = threading.Thread(target=run_scheduler, daemon=False)
-#         scheduler_thread.start()
-
-#         # Start cleanup thread
-#         logger.info("Starting cleanup thread...")
-#         cleanup_thread = threading.Thread(target=run_cleanup, daemon=False)
-#         cleanup_thread.start()
-
-#         # Schedule daily word posting
-#         config = app_components['config']
-#         daily_time = config.get('daily_word_time', '09:00')
-#         schedule.every().day.at(daily_time).do(
-#             lambda: schedule_daily_word(
-#                 app_components['db_session'],
-#                 app_components['slack_client']
-#             )
-#         )
-#         logger.info(f"Scheduled daily word posting at {daily_time}")
-
-#         # Start Flask server
-#         import os
-#         port = int(os.getenv('PORT', 3000))
-#         logger.info("Starting webhook server on port ...")
-#         app.run(
-#             host='0.0.0.0',
-#             port=port,
-#             debug=False,  # Never use debug=True in production
-#             threaded=True,  # Handle concurrent requests
-#             use_reloader=False  # Prevent double initialization
-#         )
-
-#     except KeyboardInterrupt:
-#         logger.info("Received keyboard interrupt")
-#         handle_shutdown(signal.SIGINT, None)
-
-#     except Exception as e:
-#         logger.error(f"Fatal error in main: {e}", exc_info=True)
-#         sys.exit(1)
+print("🔍 DEBUG: About to check if __name__ == '__main__'...")
 
 if __name__ == "__main__":
-    import sys
+    print("🔍 DEBUG: ✨ Script is being run directly!")
     if len(sys.argv) > 1 and sys.argv[1] == "test-fresh-init":
+        print("🔍 DEBUG: Running test-fresh-init")
         test_fresh_init()
     else:
+        print("🔍 DEBUG: About to call main()...")
         main()
