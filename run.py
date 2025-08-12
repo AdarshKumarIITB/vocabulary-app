@@ -132,7 +132,13 @@ def slack_events():
         # Get request data
         request_data = request.get_json()
         
-        # Log request for debugging (be careful with sensitive data)
+        # FAST PATH: Handle URL verification immediately (new)
+        if request_data and request_data.get('type') == 'url_verification':
+            challenge = request_data.get('challenge')
+            logger.info("Received URL verification challenge from Slack")
+            return challenge  # Return challenge string directly
+        
+        # EXISTING PATH: Everything else goes through normal flow (unchanged)
         logger.debug(f"Received webhook: {request_data.get('event', {}).get('type')}")
         
         # Process with error handling
