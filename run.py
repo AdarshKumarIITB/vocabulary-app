@@ -248,47 +248,84 @@ def main():
     global scheduler_thread, cleanup_thread, app_components
 
     try:
+        print("🚀 STEP 1: Starting main() function")
         logger.info("=" * 50)
         logger.info("Starting Vocabulary Tutor Application")
         logger.info("=" * 50)
 
-        # Initialize all components
+        print("🚀 STEP 2: About to initialize application components...")
         logger.info("Initializing application components...")
-        app_components = initialize_application()
+        
+        try:
+            print("🚀 STEP 3: Calling initialize_application()...")
+            app_components = initialize_application()
+            print("🚀 STEP 4: initialize_application() completed successfully!")
+        except Exception as init_error:
+            print(f"❌ FATAL: initialize_application() failed: {init_error}")
+            logger.error(f"Fatal error in initialize_application: {init_error}", exc_info=True)
+            return
 
         if not app_components:
+            print("❌ FATAL: app_components is None or empty")
             logger.error("Failed to initialize application")
             sys.exit(1)
-        from llm_backend.orchestrator import initialize_fresh_database
-        from database.models import check_if_database_empty
+        
+        print("🚀 STEP 5: App components initialized successfully")
+        
+        try:
+            from llm_backend.orchestrator import initialize_fresh_database
+            from database.models import check_if_database_empty
+            print("🚀 STEP 6: Imports successful")
+        except Exception as import_error:
+            print(f"❌ FATAL: Import failed: {import_error}")
+            logger.error(f"Import error: {import_error}", exc_info=True)
+            return
+
+        print("🚀 STEP 7: About to check database...")
         # Fresh initialization check
         db_session = app_components['db_session']
         slack_client = app_components['slack_client']
-        with db_session() as session:
-            if check_if_database_empty(session):
-                logger.info("Fresh database detected - running initialization workflow")
-                success = initialize_fresh_database(session, slack_client)
-                if not success:
-                    logger.error("Fresh initialization failed")
-                    return
-            else:
-                # For an existing database, ensure the theme thread exists
-                setup_theme_thread(session, slack_client)
+        
+        try:
+            with db_session() as session:
+                print("🚀 STEP 8: Database session created")
+                if check_if_database_empty(session):
+                    print("🚀 STEP 9: Fresh database detected - running initialization workflow")
+                    logger.info("Fresh database detected - running initialization workflow")
+                    success = initialize_fresh_database(session, slack_client)
+                    if not success:
+                        print("❌ FATAL: Fresh initialization failed")
+                        logger.error("Fresh initialization failed")
+                        return
+                    print("🚀 STEP 10: Fresh initialization completed")
+                else:
+                    print("🚀 STEP 9: Existing database - ensuring theme thread exists")
+                    # For an existing database, ensure the theme thread exists
+                    setup_theme_thread(session, slack_client)
+                    print("🚀 STEP 10: Theme thread setup completed")
+        except Exception as db_error:
+            print(f"❌ FATAL: Database operation failed: {db_error}")
+            logger.error(f"Database error: {db_error}", exc_info=True)
+            return
 
+        print("🚀 STEP 11: Setting up signal handlers...")
         # Setup signal handlers
         signal.signal(signal.SIGINT, handle_shutdown)
         signal.signal(signal.SIGTERM, handle_shutdown)
 
+        print("🚀 STEP 12: Starting scheduler thread...")
         # Start scheduler thread
         logger.info("Starting scheduler thread...")
         scheduler_thread = threading.Thread(target=run_scheduler, daemon=False)
         scheduler_thread.start()
 
+        print("🚀 STEP 13: Starting cleanup thread...")
         # Start cleanup thread
         logger.info("Starting cleanup thread...")
         cleanup_thread = threading.Thread(target=run_cleanup, daemon=False)
         cleanup_thread.start()
 
+        print("🚀 STEP 14: Scheduling daily word posting...")
         # Schedule daily word posting
         config = app_components['config']
         daily_time = config.get('daily_word_time', '09:00')
@@ -300,10 +337,13 @@ def main():
         )
         logger.info(f"Scheduled daily word posting at {daily_time}")
 
+        print("🚀 STEP 15: Starting Flask server...")
         # Start Flask server
         import os
         port = int(os.getenv('PORT', 3000))
-        logger.info("Starting webhook server on port ...")
+        print(f"🚀 STEP 16: About to start Flask on port {port}")
+        logger.info(f"Starting webhook server on port {port}")
+        
         app.run(
             host='0.0.0.0',
             port=port,
@@ -311,14 +351,96 @@ def main():
             threaded=True,  # Handle concurrent requests
             use_reloader=False  # Prevent double initialization
         )
+        
+        print("🚀 STEP 17: Flask server started successfully!")
 
     except KeyboardInterrupt:
+        print("🚀 Received keyboard interrupt")
         logger.info("Received keyboard interrupt")
         handle_shutdown(signal.SIGINT, None)
 
     except Exception as e:
+        print(f"❌ FATAL ERROR in main: {e}")
         logger.error(f"Fatal error in main: {e}", exc_info=True)
         sys.exit(1)
+
+
+# def main():
+#     """Main entry point with fresh initialization check"""
+#     global scheduler_thread, cleanup_thread, app_components
+
+#     try:
+#         logger.info("=" * 50)
+#         logger.info("Starting Vocabulary Tutor Application")
+#         logger.info("=" * 50)
+
+#         # Initialize all components
+#         logger.info("Initializing application components...")
+#         app_components = initialize_application()
+
+#         if not app_components:
+#             logger.error("Failed to initialize application")
+#             sys.exit(1)
+#         from llm_backend.orchestrator import initialize_fresh_database
+#         from database.models import check_if_database_empty
+#         # Fresh initialization check
+#         db_session = app_components['db_session']
+#         slack_client = app_components['slack_client']
+#         with db_session() as session:
+#             if check_if_database_empty(session):
+#                 logger.info("Fresh database detected - running initialization workflow")
+#                 success = initialize_fresh_database(session, slack_client)
+#                 if not success:
+#                     logger.error("Fresh initialization failed")
+#                     return
+#             else:
+#                 # For an existing database, ensure the theme thread exists
+#                 setup_theme_thread(session, slack_client)
+
+#         # Setup signal handlers
+#         signal.signal(signal.SIGINT, handle_shutdown)
+#         signal.signal(signal.SIGTERM, handle_shutdown)
+
+#         # Start scheduler thread
+#         logger.info("Starting scheduler thread...")
+#         scheduler_thread = threading.Thread(target=run_scheduler, daemon=False)
+#         scheduler_thread.start()
+
+#         # Start cleanup thread
+#         logger.info("Starting cleanup thread...")
+#         cleanup_thread = threading.Thread(target=run_cleanup, daemon=False)
+#         cleanup_thread.start()
+
+#         # Schedule daily word posting
+#         config = app_components['config']
+#         daily_time = config.get('daily_word_time', '09:00')
+#         schedule.every().day.at(daily_time).do(
+#             lambda: schedule_daily_word(
+#                 app_components['db_session'],
+#                 app_components['slack_client']
+#             )
+#         )
+#         logger.info(f"Scheduled daily word posting at {daily_time}")
+
+#         # Start Flask server
+#         import os
+#         port = int(os.getenv('PORT', 3000))
+#         logger.info("Starting webhook server on port ...")
+#         app.run(
+#             host='0.0.0.0',
+#             port=port,
+#             debug=False,  # Never use debug=True in production
+#             threaded=True,  # Handle concurrent requests
+#             use_reloader=False  # Prevent double initialization
+#         )
+
+#     except KeyboardInterrupt:
+#         logger.info("Received keyboard interrupt")
+#         handle_shutdown(signal.SIGINT, None)
+
+#     except Exception as e:
+#         logger.error(f"Fatal error in main: {e}", exc_info=True)
+#         sys.exit(1)
 
 if __name__ == "__main__":
     import sys
