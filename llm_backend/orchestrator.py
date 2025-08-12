@@ -9,7 +9,10 @@ from database.models import (
     create_word,
     WordHistory,
     set_theme,
-    get_current_theme
+    get_current_theme, 
+    clear_all_data,
+    SystemSettings,
+    UserTheme
 )
 from .word_generator import generate_word
 from .tutor import process_user_message
@@ -271,51 +274,55 @@ def update_word_status(session, thread_id, known_flag_value):
     return update_known_flag_by_thread(session, thread_id, known_flag_value)
 
 
-def setup_theme_thread(slack_client):
-    """
-    Creates and pins the theme thread if it doesn't exist.
-    Should be called during application initialization.
-    """
+def setup_theme_thread(session, slack_client):
+    """Sets up the pinned theme thread if it doesn't exist"""
     try:
-        # Check if theme thread already exists
-        theme_thread_id = get_theme_thread_id()
+        # Ensure session is valid
+        if session is None:
+            logger.error("Session is None in setup_theme_thread")
+            return None
+            
+        # Check for existing theme thread
+        existing_theme = session.query(UserTheme).first()
         
-        if not theme_thread_id:
-            # Create the theme thread
-            response = slack_client.create_thread(
-                "📚 **Theme Settings** - Reply here to set vocabulary theme"
-            )
-            theme_thread_id = response
+        if existing_theme:
+            logger.info(f"Found existing theme thread: {existing_theme.thread_id}")
+            return existing_theme.thread_id
             
-            # Post instructions in the thread
-            instructions = (
-                "Reply to this thread to set the theme for your vocabulary words.\n"
-                "Examples:\n"
-                "• 'Technology' - for tech-related words\n"
-                "• 'Business' - for business vocabulary\n"
-                "• 'Literature' - for literary terms\n"
-                "• 'Science' - for scientific terminology\n"
-                "• 'Clear theme' - to remove theme preference\n\n"
-                "Your most recent reply will be used as the active theme. Default theme is 'Literature' for now."
-            )
-            slack_client.post_to_thread(theme_thread_id, instructions)
+        # Create new theme thread
+        theme_message = ("🎯 **Vocabulary Themes**\n\n"
+                         "Reply to this thread to set your vocabulary theme (e.g., 'Science', 'Literature', 'Business'). "
+                         "Current theme: Literature")
+        
+        thread_id = slack_client.create_thread(theme_message)
+        
+        # Save to database
+        theme_thread = UserTheme(
+            user_id="default",
+            thread_id=thread_id,
+            theme="Literature"
+        )
+        session.add(theme_thread)
+        session.commit()
+
+        set_theme_thread_id(session, thread_id) 
+
+        
+        # Try to pin (optional)
+        try:
+            if hasattr(slack_client, 'pin_message'):
+                slack_client.pin_message(thread_id)
+            else:
+                logger.warning("Pin message not supported - continuing without pinning")
+        except Exception as e:
+            logger.warning(f"Could not pin theme thread: {e}")
             
-            # Pin the thread (requires chat:write.pin scope)
-            try:
-                slack_client.pin_message(theme_thread_id)
-            except Exception as e:
-                logger.warning(f"Could not pin theme thread: {e}")
-            
-            # Store the thread ID
-            set_theme_thread_id(theme_thread_id)
-            logger.info(f"Created theme thread: {theme_thread_id}")
-        else:
-            logger.info(f"Theme thread already exists: {theme_thread_id}")
-            
-        return theme_thread_id
+        logger.info(f"Created theme thread: {thread_id}")
+        return thread_id
         
     except Exception as e:
         logger.error(f"Error setting up theme thread: {e}")
+        session.rollback()
         return None
 
 def handle_theme_update(session, user_id, theme_text, slack_client, thread_id):
@@ -366,7 +373,47 @@ def handle_theme_update(session, user_id, theme_text, slack_client, thread_id):
             "❌ An error occurred while updating the theme. Please try again."
         )
 
-def is_theme_thread(thread_id):
+def is_theme_thread(session, thread_id):
     """Check if a thread is the theme settings thread"""
-    theme_thread_id = get_theme_thread_id()
+    theme_thread_id = get_theme_thread_id(session)
     return theme_thread_id and thread_id == theme_thread_id
+
+def initialize_fresh_database(session, slack_client):
+    """
+    Handle fresh database initialization workflow:
+    1. Clear all data
+    2. Setup theme thread with default theme
+    3. Generate first word based on default theme
+    """
+    try:
+        logger.info("Starting fresh database initialization")
+        
+        # Clear all existing data
+        if clear_all_data(session):
+            logger.info("Cleared all existing data")
+        
+        set_theme_thread_id(session, None)
+
+        # Setup theme thread with default theme
+        theme_thread_id = setup_theme_thread(session, slack_client)
+        
+        if theme_thread_id:
+
+            # Generate first word with default theme
+            logger.info("Generating first word with Literature theme")
+            success = post_new_word_workflow(session, slack_client)
+            
+            if success:
+                logger.info("Fresh initialization complete - first word posted")
+                return True
+            else:
+                logger.error("Failed to post first word during initialization")
+                return False
+        else:
+            logger.error("Failed to setup theme thread")
+            return False
+            
+    except Exception as e:
+        logger.error(f"Error in fresh initialization: {e}")
+        return False
+

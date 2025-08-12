@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+from database.models import get_system_setting, set_system_setting
+
 # Load environment variables from .env file
 load_dotenv()
 
@@ -136,17 +138,10 @@ def get_scheduler_config():
     
     return scheduler_config
 
+def get_theme_thread_id(session):
+    """Get the thread ID for the pinned theme thread from database"""
+    return get_system_setting(session, 'theme_thread_id')
 
-def get_theme_thread_id():
-    """Get the thread ID for the pinned theme thread"""
-    # This should be set after creating the pinned theme thread
-    return os.getenv('THEME_THREAD_ID', None)
-
-
-def set_theme_thread_id(thread_id):
-    """Store the theme thread ID (call this after creating the pinned thread)"""
-    # You might want to store this in database instead of env variable
-    # For production, store in database as a system setting
-    with open('.env', 'a') as f:
-        f.write(f'\nTHEME_THREAD_ID={thread_id}\n')
-    return thread_id
+def set_theme_thread_id(session, thread_id):
+    """Store the theme thread ID in database"""
+    return set_system_setting(session, 'theme_thread_id', thread_id)

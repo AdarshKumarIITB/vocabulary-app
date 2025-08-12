@@ -557,3 +557,736 @@ NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
 2025-08-12 16:11:46,450 - root - INFO - run.py:166 - Scheduler thread stopped
 2025-08-12 16:11:46,450 - root - INFO - run.py:187 - Cleanup thread stopped
 2025-08-12 16:11:46,452 - root - INFO - run.py:203 - Shutdown complete
+2025-08-12 17:38:30,359 - llm_backend.main - INFO - main.py:46 - Initializing application components...
+2025-08-12 17:38:30,363 - llm_backend.main - INFO - main.py:51 - ✓ Configuration loaded
+2025-08-12 17:38:30,547 - database.database - INFO - database.py:48 - Database engine and session created successfully
+2025-08-12 17:38:30,563 - database.database - INFO - database.py:73 - Database tables initialized successfully
+2025-08-12 17:38:30,564 - llm_backend.main - INFO - main.py:61 - ✓ Database initialized
+2025-08-12 17:38:31,154 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 17:38:31,165 - llm_backend.main - INFO - main.py:74 - ✓ Slack client initialized
+2025-08-12 17:38:32,053 - llm_backend.main - INFO - main.py:84 - ✓ OpenAI client initialized
+2025-08-12 17:38:32,055 - llm_backend.orchestrator - INFO - orchestrator.py:323 - Theme thread already exists: 1754954030.833119
+2025-08-12 17:38:32,056 - llm_backend.main - INFO - main.py:89 - Theme thread ready: 1754954030.833119
+2025-08-12 17:38:32,059 - llm_backend.main - INFO - main.py:91 - Application initialization complete
+2025-08-12 17:38:32,086 - llm_backend.orchestrator - INFO - orchestrator.py:392 - Starting fresh database initialization
+2025-08-12 17:38:32,102 - llm_backend.orchestrator - INFO - orchestrator.py:396 - Cleared all existing data
+2025-08-12 17:38:32,113 - llm_backend.orchestrator - INFO - orchestrator.py:323 - Theme thread already exists: 1754954030.833119
+2025-08-12 17:38:32,723 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755000508.801429
+2025-08-12 17:38:32,736 - llm_backend.orchestrator - INFO - orchestrator.py:408 - Generating first word with Literature theme
+2025-08-12 17:38:32,737 - llm_backend.orchestrator - INFO - orchestrator.py:66 - Starting post_new_word_workflow
+2025-08-12 17:38:38,807 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 17:38:38,839 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: metafiction
+2025-08-12 17:38:38,843 - llm_backend.orchestrator - INFO - orchestrator.py:87 - Generated word: metafiction
+2025-08-12 17:38:39,421 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755000515.433339
+2025-08-12 17:38:39,437 - llm_backend.orchestrator - INFO - orchestrator.py:98 - Created thread with ID: 1755000515.433339
+2025-08-12 17:38:40,035 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755000515.433339
+2025-08-12 17:38:40,651 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755000515.433339
+2025-08-12 17:38:41,264 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755000515.433339
+2025-08-12 17:38:41,276 - llm_backend.orchestrator - INFO - orchestrator.py:114 - Successfully posted word 'metafiction' with thread_id '1755000515.433339'
+2025-08-12 17:38:41,281 - llm_backend.orchestrator - INFO - orchestrator.py:412 - Fresh initialization complete - first word posted
+2025-08-12 17:59:53,964 - llm_backend.main - INFO - main.py:46 - Initializing application components...
+2025-08-12 17:59:53,967 - llm_backend.main - INFO - main.py:51 - ✓ Configuration loaded
+2025-08-12 17:59:54,003 - database.database - INFO - database.py:48 - Database engine and session created successfully
+2025-08-12 17:59:54,022 - database.database - INFO - database.py:73 - Database tables initialized successfully
+2025-08-12 17:59:54,022 - llm_backend.main - INFO - main.py:61 - ✓ Database initialized
+2025-08-12 17:59:54,664 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 17:59:54,665 - llm_backend.main - INFO - main.py:74 - ✓ Slack client initialized
+2025-08-12 17:59:55,258 - llm_backend.main - INFO - main.py:84 - ✓ OpenAI client initialized
+2025-08-12 17:59:55,259 - llm_backend.orchestrator - ERROR - orchestrator.py:329 - Error setting up theme thread: 'NoneType' object has no attribute 'query'
+2025-08-12 17:59:55,278 - llm_backend.main - INFO - main.py:91 - Application initialization complete
+2025-08-12 17:59:55,306 - llm_backend.orchestrator - INFO - orchestrator.py:393 - Starting fresh database initialization
+2025-08-12 17:59:55,327 - llm_backend.orchestrator - INFO - orchestrator.py:397 - Cleared all existing data
+2025-08-12 17:59:55,953 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755001791.980009
+2025-08-12 17:59:56,603 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755001791.980009
+2025-08-12 17:59:56,606 - llm_backend.orchestrator - WARNING - orchestrator.py:312 - Could not pin theme thread: 'SlackClient' object has no attribute 'pin_message'
+2025-08-12 17:59:56,634 - llm_backend.orchestrator - INFO - orchestrator.py:316 - Created theme thread: 1755001791.980009
+2025-08-12 17:59:56,666 - llm_backend.orchestrator - INFO - orchestrator.py:321 - Set default theme to 'Literature' for fresh initialization
+2025-08-12 17:59:57,244 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755001793.298519
+2025-08-12 17:59:57,256 - llm_backend.orchestrator - INFO - orchestrator.py:411 - Generating first word with Literature theme
+2025-08-12 17:59:57,257 - llm_backend.orchestrator - INFO - orchestrator.py:66 - Starting post_new_word_workflow
+2025-08-12 18:00:01,496 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 18:00:01,530 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: epistolary
+2025-08-12 18:00:01,534 - llm_backend.orchestrator - INFO - orchestrator.py:87 - Generated word: epistolary
+2025-08-12 18:00:02,069 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755001798.039819
+2025-08-12 18:00:02,073 - llm_backend.orchestrator - INFO - orchestrator.py:98 - Created thread with ID: 1755001798.039819
+2025-08-12 18:00:02,526 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755001798.039819
+2025-08-12 18:00:03,000 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755001798.039819
+2025-08-12 18:00:03,488 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755001798.039819
+2025-08-12 18:00:03,508 - llm_backend.orchestrator - INFO - orchestrator.py:114 - Successfully posted word 'epistolary' with thread_id '1755001798.039819'
+2025-08-12 18:00:03,513 - llm_backend.orchestrator - INFO - orchestrator.py:415 - Fresh initialization complete - first word posted
+2025-08-12 18:44:03,096 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 18:44:03,099 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 18:44:03,144 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 18:44:03,173 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 18:44:03,176 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 18:44:04,162 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 18:44:04,166 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 18:44:04,758 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 18:44:04,768 - llm_backend.orchestrator - ERROR - orchestrator.py:320 - Error setting up theme thread: (sqlite3.OperationalError) no such column: user_themes.thread_id
+[SQL: SELECT user_themes.id AS user_themes_id, user_themes.user_id AS user_themes_user_id, user_themes.theme AS user_themes_theme, user_themes.thread_id AS user_themes_thread_id, user_themes.updated_at AS user_themes_updated_at 
+FROM user_themes
+ LIMIT ? OFFSET ?]
+[parameters: (1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-08-12 18:44:04,770 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 18:54:48,177 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 18:54:48,197 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 18:54:48,252 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 18:54:48,263 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 18:54:48,265 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 18:54:48,909 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 18:54:48,911 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 18:54:49,581 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 18:54:49,600 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: None
+2025-08-12 18:54:49,602 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:03:18,417 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:03:18,420 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:03:18,454 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:03:18,477 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:03:18,477 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:03:19,084 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:03:19,086 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:03:19,695 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:03:19,706 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: None
+2025-08-12 19:03:19,706 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:03:19,743 - llm_backend.orchestrator - INFO - orchestrator.py:385 - Starting fresh database initialization
+2025-08-12 19:03:19,765 - llm_backend.orchestrator - INFO - orchestrator.py:389 - Cleared all existing data
+2025-08-12 19:03:20,399 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755005596.329619
+2025-08-12 19:03:20,476 - llm_backend.orchestrator - ERROR - orchestrator.py:320 - Error setting up theme thread: 'current_theme' is an invalid keyword argument for UserTheme
+2025-08-12 19:03:20,479 - llm_backend.orchestrator - ERROR - orchestrator.py:413 - Failed to setup theme thread
+2025-08-12 19:06:49,801 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:06:49,804 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:06:49,843 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:06:49,860 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:06:49,862 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:06:50,531 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:06:50,531 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:06:51,137 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:06:51,758 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755005807.662339
+2025-08-12 19:06:52,372 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755005807.662339
+2025-08-12 19:06:52,382 - llm_backend.orchestrator - INFO - orchestrator.py:317 - Created theme thread: 1755005807.662339
+2025-08-12 19:06:52,383 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:06:52,405 - llm_backend.orchestrator - INFO - orchestrator.py:386 - Starting fresh database initialization
+2025-08-12 19:06:52,477 - llm_backend.orchestrator - INFO - orchestrator.py:390 - Cleared all existing data
+2025-08-12 19:06:53,089 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755005808.980459
+2025-08-12 19:06:53,705 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755005808.980459
+2025-08-12 19:06:53,707 - llm_backend.orchestrator - INFO - orchestrator.py:317 - Created theme thread: 1755005808.980459
+2025-08-12 19:06:54,318 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755005810.255039
+2025-08-12 19:06:54,321 - llm_backend.orchestrator - INFO - orchestrator.py:404 - Generating first word with Literature theme
+2025-08-12 19:06:54,322 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 19:06:54,333 - llm_backend.word_generator - ERROR - word_generator.py:102 - Error generating word: 'str' object has no attribute 'theme'
+2025-08-12 19:06:54,336 - llm_backend.orchestrator - ERROR - orchestrator.py:120 - Error in post_new_word_workflow: 'str' object has no attribute 'theme'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\orchestrator.py", line 74, in post_new_word_workflow
+    word_result = generate_word(session)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\word_generator.py", line 54, in generate_word
+    theme_str = current_theme.theme if current_theme else "Literature"
+                ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'theme'
+2025-08-12 19:06:54,362 - llm_backend.orchestrator - ERROR - orchestrator.py:411 - Failed to post first word during initialization
+2025-08-12 19:13:44,155 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:13:44,159 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:13:44,320 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:13:44,339 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:13:44,341 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:13:44,976 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:13:44,979 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:13:45,556 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:13:45,568 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755005808.980459
+2025-08-12 19:13:45,571 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:13:45,593 - llm_backend.orchestrator - INFO - orchestrator.py:386 - Starting fresh database initialization
+2025-08-12 19:13:45,607 - llm_backend.orchestrator - INFO - orchestrator.py:390 - Cleared all existing data
+2025-08-12 19:13:46,444 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755006222.407989
+2025-08-12 19:13:47,108 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755006222.407989
+2025-08-12 19:13:47,114 - llm_backend.orchestrator - INFO - orchestrator.py:317 - Created theme thread: 1755006222.407989
+2025-08-12 19:13:47,722 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755006223.637729
+2025-08-12 19:13:47,724 - llm_backend.orchestrator - INFO - orchestrator.py:404 - Generating first word with Literature theme
+2025-08-12 19:13:47,724 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 19:13:47,733 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 19:13:54,791 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:13:54,824 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: metaphor
+2025-08-12 19:13:54,826 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: metaphor
+2025-08-12 19:13:55,506 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755006231.428759
+2025-08-12 19:13:55,508 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755006231.428759
+2025-08-12 19:13:56,130 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755006231.428759
+2025-08-12 19:13:56,735 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755006231.428759
+2025-08-12 19:13:57,348 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755006231.428759
+2025-08-12 19:13:57,359 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'metaphor' with thread_id '1755006231.428759'
+2025-08-12 19:13:57,364 - llm_backend.orchestrator - INFO - orchestrator.py:408 - Fresh initialization complete - first word posted
+2025-08-12 19:33:57,755 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:33:57,761 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:33:57,822 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:33:57,847 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:33:57,848 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:33:58,449 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:33:58,451 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:33:59,169 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:33:59,197 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755006222.407989
+2025-08-12 19:33:59,198 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:33:59,224 - llm_backend.orchestrator - INFO - orchestrator.py:389 - Starting fresh database initialization
+2025-08-12 19:33:59,236 - llm_backend.orchestrator - INFO - orchestrator.py:393 - Cleared all existing data
+2025-08-12 19:33:59,879 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755007435.778789
+2025-08-12 19:34:00,594 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755007435.778789
+2025-08-12 19:34:00,603 - llm_backend.orchestrator - INFO - orchestrator.py:320 - Created theme thread: 1755007435.778789
+2025-08-12 19:34:00,604 - llm_backend.orchestrator - INFO - orchestrator.py:403 - Generating first word with Literature theme
+2025-08-12 19:34:00,604 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 19:34:00,612 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 19:34:04,692 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:34:04,710 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: bildungsroman
+2025-08-12 19:34:04,713 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: bildungsroman
+2025-08-12 19:34:05,306 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755007441.170719
+2025-08-12 19:34:05,308 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755007441.170719
+2025-08-12 19:34:06,025 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007441.170719
+2025-08-12 19:34:06,647 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007441.170719
+2025-08-12 19:34:07,150 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007441.170719
+2025-08-12 19:34:07,182 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'bildungsroman' with thread_id '1755007441.170719'
+2025-08-12 19:34:07,212 - llm_backend.orchestrator - INFO - orchestrator.py:407 - Fresh initialization complete - first word posted
+2025-08-12 19:34:34,010 - root - INFO - run.py:245 - ==================================================
+2025-08-12 19:34:34,012 - root - INFO - run.py:246 - Starting Vocabulary Tutor Application
+2025-08-12 19:34:34,012 - root - INFO - run.py:247 - ==================================================
+2025-08-12 19:34:34,013 - root - INFO - run.py:250 - Initializing application components...
+2025-08-12 19:34:34,014 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:34:34,014 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:34:34,053 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:34:34,060 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:34:34,061 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:34:34,597 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:34:34,607 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:34:35,403 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:34:35,449 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755007435.778789
+2025-08-12 19:34:35,450 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:34:35,467 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755007435.778789
+2025-08-12 19:34:35,468 - root - INFO - run.py:277 - Starting scheduler thread...
+2025-08-12 19:34:35,471 - root - INFO - run.py:156 - Scheduler thread started
+2025-08-12 19:34:35,471 - root - INFO - run.py:282 - Starting cleanup thread...
+2025-08-12 19:34:35,494 - root - INFO - run.py:170 - Cleanup thread started
+2025-08-12 19:34:35,495 - root - INFO - run.py:295 - Scheduled daily word posting at 09:00
+2025-08-12 19:34:35,497 - root - INFO - run.py:298 - Starting webhook server on port 3000...
+2025-08-12 19:34:35,506 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-12 19:34:35,508 - llm_backend.main - INFO - main.py:392 - Cleanup job completed successfully
+2025-08-12 19:34:35,598 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://192.168.29.108:3000
+2025-08-12 19:34:35,600 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-08-12 19:35:04,163 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:04] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:10,182 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:10,380 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:10,418 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:11,809 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:11] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:15,597 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755007441.170719
+2025-08-12 19:35:15,599 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755007441.170719
+2025-08-12 19:35:15,608 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'bildungsroman'
+2025-08-12 19:35:15,625 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755007441.170719
+2025-08-12 19:35:15,631 - llm_backend.tutor - ERROR - tutor.py:81 - Error fetching thread context: 'NoneType' object has no attribute 'get_thread_messages'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\tutor.py", line 59, in fetch_thread_context
+    messages = slack_client.get_thread_messages(thread_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get_thread_messages'
+2025-08-12 19:35:18,984 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:18] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:19,860 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:35:19,871 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'bildungsroman'
+2025-08-12 19:35:19,872 - llm_backend.orchestrator - ERROR - orchestrator.py:262 - Error in handle_user_interaction: 'NoneType' object has no attribute 'post_to_thread'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\orchestrator.py", line 254, in handle_user_interaction
+    slack_client.post_to_thread(thread_id, tutor_response)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'post_to_thread'
+2025-08-12 19:35:19,896 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:35:19] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:35:38,635 - root - INFO - run.py:191 - Received signal 2, initiating graceful shutdown...
+2025-08-12 19:35:39,529 - root - INFO - run.py:166 - Scheduler thread stopped
+2025-08-12 19:35:39,573 - root - INFO - run.py:187 - Cleanup thread stopped
+2025-08-12 19:35:39,575 - root - INFO - run.py:203 - Shutdown complete
+2025-08-12 19:47:26,802 - root - INFO - run.py:245 - ==================================================
+2025-08-12 19:47:26,806 - root - INFO - run.py:246 - Starting Vocabulary Tutor Application
+2025-08-12 19:47:26,806 - root - INFO - run.py:247 - ==================================================
+2025-08-12 19:47:26,806 - root - INFO - run.py:250 - Initializing application components...
+2025-08-12 19:47:26,807 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-12 19:47:26,807 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-12 19:47:26,874 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-12 19:47:26,890 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-12 19:47:26,891 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-12 19:47:27,647 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-12 19:47:27,649 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-12 19:47:28,275 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-12 19:47:28,285 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755007435.778789
+2025-08-12 19:47:28,286 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-12 19:47:28,293 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755007435.778789
+2025-08-12 19:47:28,294 - root - INFO - run.py:277 - Starting scheduler thread...
+2025-08-12 19:47:28,296 - root - INFO - run.py:156 - Scheduler thread started
+2025-08-12 19:47:28,296 - root - INFO - run.py:282 - Starting cleanup thread...
+2025-08-12 19:47:28,297 - root - INFO - run.py:170 - Cleanup thread started
+2025-08-12 19:47:28,297 - root - INFO - run.py:295 - Scheduled daily word posting at 09:00
+2025-08-12 19:47:28,303 - root - INFO - run.py:298 - Starting webhook server on port 3000...
+2025-08-12 19:47:28,314 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-12 19:47:28,315 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-12 19:47:28,360 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://192.168.29.108:3000
+2025-08-12 19:47:28,365 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-08-12 19:55:01,738 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755007441.170719
+2025-08-12 19:55:01,750 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755007441.170719
+2025-08-12 19:55:01,753 - llm_backend.orchestrator - INFO - orchestrator.py:194 - Word 'bildungsroman' already has known_flag set to False
+2025-08-12 19:55:01,754 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755007441.170719
+2025-08-12 19:55:02,431 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 6 messages from thread 1755007441.170719
+2025-08-12 19:55:05,636 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:55:05] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:55:08,563 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:55:08,581 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'bildungsroman'
+2025-08-12 19:55:09,177 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007441.170719
+2025-08-12 19:55:09,195 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:55:09] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:55:10,564 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:55:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:56:57,358 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755007441.170719
+2025-08-12 19:56:57,359 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755007441.170719
+2025-08-12 19:56:57,362 - llm_backend.orchestrator - INFO - orchestrator.py:166 - User requested new word from already-responded thread for 'bildungsroman'
+2025-08-12 19:56:57,940 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007441.170719
+2025-08-12 19:56:57,944 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 19:56:57,947 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 19:56:58,795 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:56:58] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:00,741 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:00] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:06,430 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:57:06,435 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: epistolary
+2025-08-12 19:57:06,436 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: epistolary
+2025-08-12 19:57:07,021 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755008822.864919
+2025-08-12 19:57:07,023 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755008822.864919
+2025-08-12 19:57:07,657 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008822.864919
+2025-08-12 19:57:07,817 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:07] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:08,274 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008822.864919
+2025-08-12 19:57:08,812 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:08] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:08,841 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008822.864919
+2025-08-12 19:57:08,852 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'epistolary' with thread_id '1755008822.864919'
+2025-08-12 19:57:08,860 - llm_backend.orchestrator - INFO - orchestrator.py:188 - Successfully posted new word after user request
+2025-08-12 19:57:08,866 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:08] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:09,642 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:09] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:10,305 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:31,825 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755007435.778789
+2025-08-12 19:57:31,829 - llm_backend.orchestrator - INFO - orchestrator.py:367 - Theme updated for user U099LNGU83W: Feelings
+2025-08-12 19:57:31,857 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:31] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:33,079 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:33] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:44,051 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755008822.864919
+2025-08-12 19:57:44,055 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755008822.864919
+2025-08-12 19:57:44,060 - llm_backend.orchestrator - INFO - orchestrator.py:213 - User indicated they knew the word 'epistolary'
+2025-08-12 19:57:44,729 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008822.864919
+2025-08-12 19:57:44,732 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 19:57:44,737 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 19:57:46,084 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:46] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:57:47,439 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:57:47] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:00,294 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:58:00,299 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: metafiction
+2025-08-12 19:58:00,301 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: metafiction
+2025-08-12 19:58:00,867 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755008876.784299
+2025-08-12 19:58:00,869 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755008876.784299
+2025-08-12 19:58:01,522 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008876.784299
+2025-08-12 19:58:01,869 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:01] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:02,079 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:02] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:02,105 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008876.784299
+2025-08-12 19:58:02,851 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008876.784299
+2025-08-12 19:58:02,877 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'metafiction' with thread_id '1755008876.784299'
+2025-08-12 19:58:02,895 - llm_backend.orchestrator - INFO - orchestrator.py:231 - Successfully posted new word after user knew previous word
+2025-08-12 19:58:02,900 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:02] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:03,404 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:03] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:04,137 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:04] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:20,288 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755008876.784299
+2025-08-12 19:58:20,292 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755008876.784299
+2025-08-12 19:58:20,295 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'metafiction'
+2025-08-12 19:58:20,321 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755008876.784299
+2025-08-12 19:58:20,922 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 5 messages from thread 1755008876.784299
+2025-08-12 19:58:23,481 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:23] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:25,177 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 19:58:25,180 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'metafiction'
+2025-08-12 19:58:25,791 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008876.784299
+2025-08-12 19:58:25,793 - llm_backend.orchestrator - INFO - orchestrator.py:256 - Successfully handled learning interaction for word 'metafiction'
+2025-08-12 19:58:25,797 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:25] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 19:58:26,963 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 19:58:26] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:47:30,811 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-12 20:47:30,814 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-12 20:49:21,068 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755008876.784299
+2025-08-12 20:49:21,072 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755008876.784299
+2025-08-12 20:49:21,077 - llm_backend.orchestrator - INFO - orchestrator.py:166 - User requested new word from already-responded thread for 'metafiction'
+2025-08-12 20:49:21,836 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755008876.784299
+2025-08-12 20:49:21,840 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 20:49:21,843 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 20:49:22,675 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:22] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:24,849 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:24] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:25,213 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 20:49:25,219 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: pastiche
+2025-08-12 20:49:25,222 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: pastiche
+2025-08-12 20:49:25,829 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755011961.632729
+2025-08-12 20:49:25,840 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755011961.632729
+2025-08-12 20:49:26,444 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:49:26,803 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:26] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:27,161 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:49:27,625 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:27] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:27,776 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:49:27,803 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'pastiche' with thread_id '1755011961.632729'
+2025-08-12 20:49:27,823 - llm_backend.orchestrator - INFO - orchestrator.py:188 - Successfully posted new word after user request
+2025-08-12 20:49:27,827 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:27] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:28,337 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:28] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:29,048 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:29] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:36,608 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755011961.632729
+2025-08-12 20:49:36,610 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755011961.632729
+2025-08-12 20:49:36,615 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'pastiche'
+2025-08-12 20:49:36,640 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755011961.632729
+2025-08-12 20:49:37,309 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 5 messages from thread 1755011961.632729
+2025-08-12 20:49:39,935 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:39] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:40,575 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 20:49:40,581 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'pastiche'
+2025-08-12 20:49:41,189 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:49:41,191 - llm_backend.orchestrator - INFO - orchestrator.py:256 - Successfully handled learning interaction for word 'pastiche'
+2025-08-12 20:49:41,195 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:41] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:42,370 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:42] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:49:55,145 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755011961.632729
+2025-08-12 20:49:55,148 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755011961.632729
+2025-08-12 20:49:55,151 - llm_backend.orchestrator - INFO - orchestrator.py:194 - Word 'pastiche' already has known_flag set to False
+2025-08-12 20:49:55,151 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755011961.632729
+2025-08-12 20:49:55,847 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 7 messages from thread 1755011961.632729
+2025-08-12 20:49:56,915 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:49:56] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:00,339 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 20:50:00,342 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'pastiche'
+2025-08-12 20:50:01,056 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:50:01,063 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:01] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:03,043 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:03] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:10,912 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755011961.632729
+2025-08-12 20:50:10,914 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755011961.632729
+2025-08-12 20:50:10,916 - llm_backend.orchestrator - INFO - orchestrator.py:166 - User requested new word from already-responded thread for 'pastiche'
+2025-08-12 20:50:11,604 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755011961.632729
+2025-08-12 20:50:11,607 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-12 20:50:11,610 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-12 20:50:12,688 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:12] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:14,370 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-12 20:50:14,375 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: verisimilitude
+2025-08-12 20:50:14,376 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: verisimilitude
+2025-08-12 20:50:14,617 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:14] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:14,985 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755012010.792259
+2025-08-12 20:50:14,990 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755012010.792259
+2025-08-12 20:50:15,598 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755012010.792259
+2025-08-12 20:50:16,213 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755012010.792259
+2025-08-12 20:50:16,280 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:16] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:16,654 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:16] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:16,830 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755012010.792259
+2025-08-12 20:50:16,854 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'verisimilitude' with thread_id '1755012010.792259'
+2025-08-12 20:50:16,874 - llm_backend.orchestrator - INFO - orchestrator.py:188 - Successfully posted new word after user request
+2025-08-12 20:50:16,878 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:16] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:17,674 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:17] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 20:50:18,923 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [12/Aug/2025 20:50:18] "POST /slack/events HTTP/1.1" 200 -
+2025-08-12 21:47:33,840 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-12 21:47:33,844 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-13 01:19:44,571 - root - INFO - run.py:191 - Received signal 2, initiating graceful shutdown...
+2025-08-13 01:19:46,285 - root - INFO - run.py:166 - Scheduler thread stopped
+2025-08-13 01:19:46,336 - root - INFO - run.py:187 - Cleanup thread stopped
+2025-08-13 01:19:46,903 - root - INFO - run.py:203 - Shutdown complete
+2025-08-13 01:22:45,638 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:22:45,640 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:22:45,680 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:22:45,695 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:22:45,695 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:22:46,289 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:22:46,290 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:22:46,847 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:22:46,856 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755007435.778789
+2025-08-13 01:22:46,856 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:22:46,884 - llm_backend.orchestrator - INFO - orchestrator.py:389 - Starting fresh database initialization
+2025-08-13 01:22:46,895 - llm_backend.orchestrator - INFO - orchestrator.py:393 - Cleared all existing data
+2025-08-13 01:22:47,518 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028365.506509
+2025-08-13 01:22:48,236 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755028365.506509
+2025-08-13 01:22:48,237 - llm_backend.orchestrator - INFO - orchestrator.py:320 - Created theme thread: 1755028365.506509
+2025-08-13 01:22:48,237 - llm_backend.orchestrator - INFO - orchestrator.py:403 - Generating first word with Literature theme
+2025-08-13 01:22:48,237 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:22:48,246 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-13 01:22:54,255 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:22:54,289 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: epistolary
+2025-08-13 01:22:54,289 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: epistolary
+2025-08-13 01:22:54,744 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028372.787209
+2025-08-13 01:22:54,745 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755028372.787209
+2025-08-13 01:22:55,201 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028372.787209
+2025-08-13 01:22:55,725 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028372.787209
+2025-08-13 01:22:56,181 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028372.787209
+2025-08-13 01:22:56,189 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'epistolary' with thread_id '1755028372.787209'
+2025-08-13 01:22:56,189 - llm_backend.orchestrator - INFO - orchestrator.py:407 - Fresh initialization complete - first word posted
+2025-08-13 01:23:07,298 - root - INFO - run.py:245 - ==================================================
+2025-08-13 01:23:07,300 - root - INFO - run.py:246 - Starting Vocabulary Tutor Application
+2025-08-13 01:23:07,301 - root - INFO - run.py:247 - ==================================================
+2025-08-13 01:23:07,301 - root - INFO - run.py:250 - Initializing application components...
+2025-08-13 01:23:07,302 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:23:07,302 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:23:07,350 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:23:07,356 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:23:07,357 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:23:07,997 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:23:07,997 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:23:08,541 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:23:08,552 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028365.506509
+2025-08-13 01:23:08,556 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:23:08,566 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028365.506509
+2025-08-13 01:23:08,566 - root - INFO - run.py:277 - Starting scheduler thread...
+2025-08-13 01:23:08,567 - root - INFO - run.py:156 - Scheduler thread started
+2025-08-13 01:23:08,567 - root - INFO - run.py:282 - Starting cleanup thread...
+2025-08-13 01:23:08,569 - root - INFO - run.py:170 - Cleanup thread started
+2025-08-13 01:23:08,569 - root - INFO - run.py:295 - Scheduled daily word posting at 09:00
+2025-08-13 01:23:08,589 - root - INFO - run.py:298 - Starting webhook server on port 3000...
+2025-08-13 01:23:08,595 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-13 01:23:08,596 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-13 01:23:08,625 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://192.168.29.108:3000
+2025-08-13 01:23:08,625 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-08-13 01:23:34,836 - root - INFO - run.py:191 - Received signal 2, initiating graceful shutdown...
+2025-08-13 01:23:35,583 - root - INFO - run.py:166 - Scheduler thread stopped
+2025-08-13 01:23:35,613 - root - INFO - run.py:187 - Cleanup thread stopped
+2025-08-13 01:23:35,614 - root - INFO - run.py:203 - Shutdown complete
+2025-08-13 01:23:42,601 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:23:42,604 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:23:42,640 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:23:42,645 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:23:42,646 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:23:43,222 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:23:43,225 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:23:43,754 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:23:43,767 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028365.506509
+2025-08-13 01:23:43,768 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:23:43,790 - llm_backend.orchestrator - INFO - orchestrator.py:389 - Starting fresh database initialization
+2025-08-13 01:23:43,805 - llm_backend.orchestrator - INFO - orchestrator.py:393 - Cleared all existing data
+2025-08-13 01:23:44,453 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028422.441179
+2025-08-13 01:23:45,069 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755028422.441179
+2025-08-13 01:23:45,106 - llm_backend.orchestrator - INFO - orchestrator.py:320 - Created theme thread: 1755028422.441179
+2025-08-13 01:23:45,109 - llm_backend.orchestrator - INFO - orchestrator.py:403 - Generating first word with Literature theme
+2025-08-13 01:23:45,109 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:23:45,123 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-13 01:23:49,430 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:23:49,445 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: bildungsroman
+2025-08-13 01:23:49,446 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: bildungsroman
+2025-08-13 01:23:49,887 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028427.946089
+2025-08-13 01:23:49,905 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755028427.946089
+2025-08-13 01:23:50,497 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028427.946089
+2025-08-13 01:23:51,224 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028427.946089
+2025-08-13 01:23:51,840 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028427.946089
+2025-08-13 01:23:51,850 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'bildungsroman' with thread_id '1755028427.946089'
+2025-08-13 01:23:51,852 - llm_backend.orchestrator - INFO - orchestrator.py:407 - Fresh initialization complete - first word posted
+2025-08-13 01:24:08,423 - root - INFO - run.py:245 - ==================================================
+2025-08-13 01:24:08,426 - root - INFO - run.py:246 - Starting Vocabulary Tutor Application
+2025-08-13 01:24:08,426 - root - INFO - run.py:247 - ==================================================
+2025-08-13 01:24:08,427 - root - INFO - run.py:250 - Initializing application components...
+2025-08-13 01:24:08,427 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:24:08,427 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:24:08,474 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:24:08,481 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:24:08,488 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:24:09,030 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:24:09,034 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:24:09,548 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:24:09,568 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028422.441179
+2025-08-13 01:24:09,571 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:24:09,582 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028422.441179
+2025-08-13 01:24:09,585 - root - INFO - run.py:277 - Starting scheduler thread...
+2025-08-13 01:24:09,587 - root - INFO - run.py:156 - Scheduler thread started
+2025-08-13 01:24:09,587 - root - INFO - run.py:282 - Starting cleanup thread...
+2025-08-13 01:24:09,589 - root - INFO - run.py:170 - Cleanup thread started
+2025-08-13 01:24:09,589 - root - INFO - run.py:295 - Scheduled daily word posting at 09:00
+2025-08-13 01:24:09,591 - root - INFO - run.py:298 - Starting webhook server on port 3000...
+2025-08-13 01:24:09,606 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-13 01:24:09,613 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-13 01:24:09,621 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://192.168.29.108:3000
+2025-08-13 01:24:09,627 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-08-13 01:24:17,756 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755028427.946089
+2025-08-13 01:24:17,760 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755028427.946089
+2025-08-13 01:24:17,764 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'bildungsroman'
+2025-08-13 01:24:17,772 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755028427.946089
+2025-08-13 01:24:18,412 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 5 messages from thread 1755028427.946089
+2025-08-13 01:24:21,205 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:21] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:22,961 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:24:22,995 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'bildungsroman'
+2025-08-13 01:24:23,689 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028427.946089
+2025-08-13 01:24:23,694 - llm_backend.orchestrator - INFO - orchestrator.py:256 - Successfully handled learning interaction for word 'bildungsroman'
+2025-08-13 01:24:23,700 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:23] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:25,276 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:25] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:29,124 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755028427.946089
+2025-08-13 01:24:29,127 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755028427.946089
+2025-08-13 01:24:29,131 - llm_backend.orchestrator - INFO - orchestrator.py:166 - User requested new word from already-responded thread for 'bildungsroman'
+2025-08-13 01:24:29,818 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028427.946089
+2025-08-13 01:24:29,822 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:24:29,825 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-13 01:24:30,484 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:30] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:32,630 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:32] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:38,629 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:24:38,635 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: epistolary
+2025-08-13 01:24:38,636 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: epistolary
+2025-08-13 01:24:39,238 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028477.225369
+2025-08-13 01:24:39,242 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755028477.225369
+2025-08-13 01:24:39,854 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028477.225369
+2025-08-13 01:24:40,094 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:40] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:40,468 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028477.225369
+2025-08-13 01:24:41,082 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028477.225369
+2025-08-13 01:24:41,090 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'epistolary' with thread_id '1755028477.225369'
+2025-08-13 01:24:41,094 - llm_backend.orchestrator - INFO - orchestrator.py:188 - Successfully posted new word after user request
+2025-08-13 01:24:41,098 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:41] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:41,216 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:41] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:41,428 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:41] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:41,756 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:41] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:46,614 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028422.441179
+2025-08-13 01:24:46,617 - llm_backend.orchestrator - INFO - orchestrator.py:367 - Theme updated for user U099LNGU83W: Feelings
+2025-08-13 01:24:46,626 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:46] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:47,009 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:47] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:47,774 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:47] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:51,503 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755028477.225369
+2025-08-13 01:24:51,506 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755028477.225369
+2025-08-13 01:24:51,509 - llm_backend.orchestrator - INFO - orchestrator.py:213 - User indicated they knew the word 'epistolary'
+2025-08-13 01:24:52,146 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028477.225369
+2025-08-13 01:24:52,151 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:24:52,157 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-13 01:24:53,191 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:53] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:54,006 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:54] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:54,559 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:54] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:54,580 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:54] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:55,264 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:55] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:55,332 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:55] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:56,135 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:24:56,141 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: metafiction
+2025-08-13 01:24:56,142 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: metafiction
+2025-08-13 01:24:56,750 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755028494.747299
+2025-08-13 01:24:56,753 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755028494.747299
+2025-08-13 01:24:57,365 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028494.747299
+2025-08-13 01:24:57,913 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:57] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:57,932 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028494.747299
+2025-08-13 01:24:58,491 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028494.747299
+2025-08-13 01:24:58,501 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'metafiction' with thread_id '1755028494.747299'
+2025-08-13 01:24:58,503 - llm_backend.orchestrator - INFO - orchestrator.py:231 - Successfully posted new word after user knew previous word
+2025-08-13 01:24:58,509 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:58] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:59,006 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:59] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:59,326 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:59] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:24:59,478 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:24:59] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:05,486 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755028494.747299
+2025-08-13 01:25:05,488 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755028494.747299
+2025-08-13 01:25:05,498 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'metafiction'
+2025-08-13 01:25:05,517 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755028494.747299
+2025-08-13 01:25:06,188 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 5 messages from thread 1755028494.747299
+2025-08-13 01:25:08,892 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:08] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:09,858 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:25:09,861 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'metafiction'
+2025-08-13 01:25:10,473 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028494.747299
+2025-08-13 01:25:10,475 - llm_backend.orchestrator - INFO - orchestrator.py:256 - Successfully handled learning interaction for word 'metafiction'
+2025-08-13 01:25:10,480 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:11,845 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:11] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:26,570 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755028494.747299
+2025-08-13 01:25:26,570 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755028494.747299
+2025-08-13 01:25:26,573 - llm_backend.orchestrator - INFO - orchestrator.py:194 - Word 'metafiction' already has known_flag set to False
+2025-08-13 01:25:26,573 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755028494.747299
+2025-08-13 01:25:27,082 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 7 messages from thread 1755028494.747299
+2025-08-13 01:25:30,215 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:30] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:30,861 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:25:30,865 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'metafiction'
+2025-08-13 01:25:31,465 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755028494.747299
+2025-08-13 01:25:31,473 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:31] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:25:33,441 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:25:33] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:26:16,749 - root - INFO - run.py:191 - Received signal 2, initiating graceful shutdown...
+2025-08-13 01:26:16,765 - root - INFO - run.py:187 - Cleanup thread stopped
+2025-08-13 01:26:17,748 - root - INFO - run.py:166 - Scheduler thread stopped
+2025-08-13 01:26:17,762 - root - INFO - run.py:203 - Shutdown complete
+2025-08-13 01:41:55,471 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:41:55,474 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:41:55,645 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:41:55,659 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:41:55,662 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:41:56,294 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:41:56,296 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:41:56,967 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:41:56,984 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755028422.441179
+2025-08-13 01:41:56,986 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:41:57,016 - llm_backend.orchestrator - INFO - orchestrator.py:389 - Starting fresh database initialization
+2025-08-13 01:41:57,032 - llm_backend.orchestrator - INFO - orchestrator.py:393 - Cleared all existing data
+2025-08-13 01:41:57,920 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755029515.849399
+2025-08-13 01:41:58,638 - slack_integration.slack_client - INFO - slack_client.py:278 - Successfully pinned message 1755029515.849399
+2025-08-13 01:41:58,640 - llm_backend.orchestrator - INFO - orchestrator.py:320 - Created theme thread: 1755029515.849399
+2025-08-13 01:41:58,640 - llm_backend.orchestrator - INFO - orchestrator.py:403 - Generating first word with Literature theme
+2025-08-13 01:41:58,641 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:41:58,649 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Literature
+2025-08-13 01:42:06,001 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:42:06,024 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: epistolary
+2025-08-13 01:42:06,025 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: epistolary
+2025-08-13 01:42:06,458 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755029524.497469
+2025-08-13 01:42:06,461 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755029524.497469
+2025-08-13 01:42:07,069 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029524.497469
+2025-08-13 01:42:07,530 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029524.497469
+2025-08-13 01:42:08,067 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029524.497469
+2025-08-13 01:42:08,079 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'epistolary' with thread_id '1755029524.497469'
+2025-08-13 01:42:08,084 - llm_backend.orchestrator - INFO - orchestrator.py:407 - Fresh initialization complete - first word posted
+2025-08-13 01:42:16,065 - root - INFO - run.py:245 - ==================================================
+2025-08-13 01:42:16,067 - root - INFO - run.py:246 - Starting Vocabulary Tutor Application
+2025-08-13 01:42:16,068 - root - INFO - run.py:247 - ==================================================
+2025-08-13 01:42:16,068 - root - INFO - run.py:250 - Initializing application components...
+2025-08-13 01:42:16,068 - llm_backend.main - INFO - main.py:43 - Initializing application components...
+2025-08-13 01:42:16,069 - llm_backend.main - INFO - main.py:48 - ✓ Configuration loaded
+2025-08-13 01:42:16,115 - database.database - INFO - database.py:50 - Database engine and session created successfully
+2025-08-13 01:42:16,125 - database.database - INFO - database.py:75 - Database tables initialized successfully
+2025-08-13 01:42:16,128 - llm_backend.main - INFO - main.py:53 - ✓ Database initialized
+2025-08-13 01:42:16,763 - slack_integration.slack_client - INFO - slack_client.py:31 - Slack authentication successful. Bot ID: B09A4QGS9Q9
+2025-08-13 01:42:16,765 - llm_backend.main - INFO - main.py:60 - ✓ Slack client initialized
+2025-08-13 01:42:17,248 - llm_backend.main - INFO - main.py:64 - ✓ OpenAI client initialized
+2025-08-13 01:42:17,277 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755029515.849399
+2025-08-13 01:42:17,279 - llm_backend.main - INFO - main.py:74 - Application initialization complete
+2025-08-13 01:42:17,286 - llm_backend.orchestrator - INFO - orchestrator.py:289 - Found existing theme thread: 1755029515.849399
+2025-08-13 01:42:17,288 - root - INFO - run.py:277 - Starting scheduler thread...
+2025-08-13 01:42:17,289 - root - INFO - run.py:156 - Scheduler thread started
+2025-08-13 01:42:17,290 - root - INFO - run.py:282 - Starting cleanup thread...
+2025-08-13 01:42:17,292 - root - INFO - run.py:170 - Cleanup thread started
+2025-08-13 01:42:17,292 - root - INFO - run.py:295 - Scheduled daily word posting at 09:00
+2025-08-13 01:42:17,294 - root - INFO - run.py:298 - Starting webhook server on port 3000...
+2025-08-13 01:42:17,306 - database.models - INFO - models.py:62 - Cleaned up 0 old processed events
+2025-08-13 01:42:17,308 - llm_backend.main - INFO - main.py:397 - Cleanup job completed successfully
+2025-08-13 01:42:17,330 - werkzeug - INFO - _internal.py:97 - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:3000
+ * Running on http://192.168.29.108:3000
+2025-08-13 01:42:17,333 - werkzeug - INFO - _internal.py:97 - [33mPress CTRL+C to quit[0m
+2025-08-13 01:42:29,162 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029515.849399
+2025-08-13 01:42:29,227 - llm_backend.orchestrator - INFO - orchestrator.py:367 - Theme updated for user U099LNGU83W: Change theme to business
+2025-08-13 01:42:29,252 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:29] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:30,504 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:30] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:45,970 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755029524.497469
+2025-08-13 01:42:45,972 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755029524.497469
+2025-08-13 01:42:45,975 - llm_backend.orchestrator - INFO - orchestrator.py:213 - User indicated they knew the word 'epistolary'
+2025-08-13 01:42:46,664 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029524.497469
+2025-08-13 01:42:46,665 - llm_backend.orchestrator - INFO - orchestrator.py:68 - Starting post_new_word_workflow
+2025-08-13 01:42:46,673 - llm_backend.word_generator - INFO - word_generator.py:56 - Generating word with theme: Change theme to business
+2025-08-13 01:42:47,962 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:47] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:49,460 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:49] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:51,886 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:42:51,903 - llm_backend.word_generator - INFO - word_generator.py:78 - Generated unique word: acquisition
+2025-08-13 01:42:51,905 - llm_backend.orchestrator - INFO - orchestrator.py:89 - Generated word: acquisition
+2025-08-13 01:42:52,502 - slack_integration.slack_client - INFO - slack_client.py:50 - Created new thread with ID: 1755029570.478729
+2025-08-13 01:42:52,504 - llm_backend.orchestrator - INFO - orchestrator.py:100 - Created thread with ID: 1755029570.478729
+2025-08-13 01:42:53,128 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029570.478729
+2025-08-13 01:42:53,191 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:53] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:53,629 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029570.478729
+2025-08-13 01:42:54,242 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029570.478729
+2025-08-13 01:42:54,276 - llm_backend.orchestrator - INFO - orchestrator.py:116 - Successfully posted word 'acquisition' with thread_id '1755029570.478729'
+2025-08-13 01:42:54,287 - llm_backend.orchestrator - INFO - orchestrator.py:231 - Successfully posted new word after user knew previous word
+2025-08-13 01:42:54,292 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:54] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:54,372 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:54] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:55,479 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:55] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:42:55,525 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:42:55] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:02,824 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:02] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:03,582 - llm_backend.orchestrator - INFO - orchestrator.py:149 - Handling user interaction in thread 1755029570.478729
+2025-08-13 01:43:03,585 - llm_backend.orchestrator - INFO - orchestrator.py:153 - Handling interaction from user U099LNGU83W in thread 1755029570.478729
+2025-08-13 01:43:03,589 - llm_backend.orchestrator - INFO - orchestrator.py:237 - User is learning the word 'acquisition'
+2025-08-13 01:43:03,615 - llm_backend.tutor - INFO - tutor.py:18 - Processing user message in thread 1755029570.478729
+2025-08-13 01:43:04,077 - slack_integration.slack_client - INFO - slack_client.py:115 - Retrieved 5 messages from thread 1755029570.478729
+2025-08-13 01:43:07,599 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:07] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:07,764 - httpx - INFO - _client.py:1025 - HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+2025-08-13 01:43:07,767 - llm_backend.tutor - INFO - tutor.py:37 - Generated response for word 'acquisition'
+2025-08-13 01:43:08,374 - slack_integration.slack_client - INFO - slack_client.py:73 - Posted message to thread 1755029570.478729
+2025-08-13 01:43:08,377 - llm_backend.orchestrator - INFO - orchestrator.py:256 - Successfully handled learning interaction for word 'acquisition'
+2025-08-13 01:43:08,381 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:08] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:09,236 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:09] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:09,694 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:09] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:09,848 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:09] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:10,551 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:10,859 - werkzeug - INFO - _internal.py:97 - 127.0.0.1 - - [13/Aug/2025 01:43:10] "POST /slack/events HTTP/1.1" 200 -
+2025-08-13 01:43:14,868 - root - INFO - run.py:191 - Received signal 2, initiating graceful shutdown...
+2025-08-13 01:43:15,562 - root - INFO - run.py:187 - Cleanup thread stopped
+2025-08-13 01:43:15,563 - root - INFO - run.py:166 - Scheduler thread stopped
+2025-08-13 01:43:15,572 - root - INFO - run.py:203 - Shutdown complete

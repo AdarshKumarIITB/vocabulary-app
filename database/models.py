@@ -204,16 +204,21 @@ class UserTheme(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     user_id = Column(String, unique=True, nullable=False, index=True)
     theme = Column(String, nullable=True)
+    thread_id = Column(String, nullable=True)  # Added missing thread_id field
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
-def get_current_theme(session, user_id='default'):
-    """Get the current theme for word generation"""
+def get_current_theme(session):
+    """Return the theme from the most-recently updated record,
+    ignoring user_id.  Falls back to 'Literature' if the table is
+    empty or an error occurs.
+    """
     try:
-        theme_record = session.query(UserTheme).filter_by(user_id=user_id).first()
-        return theme_record.theme if theme_record else None
+        record= (session.query(UserTheme).order_by(UserTheme.updated_at.desc()).first())
+        return record.theme if record else "Literature"
+
     except Exception as e:
         logger.error(f"Error getting theme: {e}")
-        return None
+        return "Literature"
 
 def set_theme(session, theme, user_id='default'):
     """Set or update the theme for word generation"""
@@ -231,3 +236,49 @@ def set_theme(session, theme, user_id='default'):
         session.rollback()
         logger.error(f"Error setting theme: {e}")
         return False
+
+
+def clear_all_data(session):
+    """Clear all data from the database for fresh initialization"""
+    try:
+        session.query(WordHistory).delete()
+        session.query(UserTheme).delete()  # If you have a Theme table
+        session.query(ProcessedEvent).delete()
+        session.query(SystemSettings).delete()  # Clear system settings
+        session.commit()
+        return True
+    except Exception as e:
+        session.rollback()
+        return False
+
+def check_if_database_empty(session):
+    """Check if database is freshly initialized (no words yet)"""
+    word_count = session.query(WordHistory).count()
+    return word_count == 0
+
+
+class SystemSettings(Base):
+    """Store system-wide settings like theme thread ID"""
+    __tablename__ = 'system_settings'
+    
+    key = Column(String, primary_key=True)
+    value = Column(String)
+    updated_at = Column(DateTime, default=datetime.utcnow)
+
+def get_system_setting(session, key):
+    """Get a system setting by key"""
+    setting = session.query(SystemSettings).filter_by(key=key).first()
+    return setting.value if setting else None
+
+def set_system_setting(session, key, value):
+    """Set or update a system setting"""
+    setting = session.query(SystemSettings).filter_by(key=key).first()
+    if setting:
+        setting.value = value
+        setting.updated_at = datetime.utcnow()
+    else:
+        setting = SystemSettings(key=key, value=value)
+        session.add(setting)
+    session.commit()
+    return value
+

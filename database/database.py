@@ -6,6 +6,8 @@ import logging
 from config.settings import get_database_url
 
 # Set up logging
+
+_Session = None  # Global session variable to be initialized later
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 

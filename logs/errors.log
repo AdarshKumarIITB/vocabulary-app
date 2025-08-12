@@ -176,3 +176,34 @@ Traceback (most recent call last):
     slack_client=slack_client,
                  ^^^^^^^^^^^^
 NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 17:59:55,259 - llm_backend.orchestrator - ERROR - orchestrator.py:329 - Error setting up theme thread: 'NoneType' object has no attribute 'query'
+2025-08-12 18:44:04,768 - llm_backend.orchestrator - ERROR - orchestrator.py:320 - Error setting up theme thread: (sqlite3.OperationalError) no such column: user_themes.thread_id
+[SQL: SELECT user_themes.id AS user_themes_id, user_themes.user_id AS user_themes_user_id, user_themes.theme AS user_themes_theme, user_themes.thread_id AS user_themes_thread_id, user_themes.updated_at AS user_themes_updated_at 
+FROM user_themes
+ LIMIT ? OFFSET ?]
+[parameters: (1, 0)]
+(Background on this error at: https://sqlalche.me/e/20/e3q8)
+2025-08-12 19:03:20,476 - llm_backend.orchestrator - ERROR - orchestrator.py:320 - Error setting up theme thread: 'current_theme' is an invalid keyword argument for UserTheme
+2025-08-12 19:03:20,479 - llm_backend.orchestrator - ERROR - orchestrator.py:413 - Failed to setup theme thread
+2025-08-12 19:06:54,333 - llm_backend.word_generator - ERROR - word_generator.py:102 - Error generating word: 'str' object has no attribute 'theme'
+2025-08-12 19:06:54,336 - llm_backend.orchestrator - ERROR - orchestrator.py:120 - Error in post_new_word_workflow: 'str' object has no attribute 'theme'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\orchestrator.py", line 74, in post_new_word_workflow
+    word_result = generate_word(session)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\word_generator.py", line 54, in generate_word
+    theme_str = current_theme.theme if current_theme else "Literature"
+                ^^^^^^^^^^^^^^^^^^^
+AttributeError: 'str' object has no attribute 'theme'
+2025-08-12 19:06:54,362 - llm_backend.orchestrator - ERROR - orchestrator.py:411 - Failed to post first word during initialization
+2025-08-12 19:35:15,631 - llm_backend.tutor - ERROR - tutor.py:81 - Error fetching thread context: 'NoneType' object has no attribute 'get_thread_messages'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\tutor.py", line 59, in fetch_thread_context
+    messages = slack_client.get_thread_messages(thread_id)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'get_thread_messages'
+2025-08-12 19:35:19,872 - llm_backend.orchestrator - ERROR - orchestrator.py:262 - Error in handle_user_interaction: 'NoneType' object has no attribute 'post_to_thread'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\orchestrator.py", line 254, in handle_user_interaction
+    slack_client.post_to_thread(thread_id, tutor_response)
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'post_to_thread'

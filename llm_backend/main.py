@@ -39,57 +39,51 @@ openai_rate_limiter = RateLimiter(max_calls=50, time_window=60)  # 50 calls per 
 
 
 def initialize_application():
-    """
-    Main initialization function that sets up all components
-    """
+    """Initialize all application components"""
+    logger.info("Initializing application components...")
+    
     try:
-        logger.info("Initializing application components...")
-        
         # Load configuration
         config = load_config()
-        app_components['config'] = config
         logger.info("✓ Configuration loaded")
         
         # Initialize database
-        database_url = get_database_url()
-        if not database_url:
-            raise ValueError("DATABASE_URL not configured")
-        
         engine, SessionMaker = create_engine_and_session()
         init_database(engine)
-        app_components['db_session'] = SessionMaker
         logger.info("✓ Database initialized")
         
         # Initialize Slack client
-        slack_config = get_slack_config()
-        if not slack_config['bot_token'] or not slack_config['channel_id']:
-            logger.warning("⚠ Slack credentials not fully configured - using mock mode")
-            app_components['slack_client'] = None
-        else:
-            slack_client = SlackClient(
-                slack_config['bot_token'],
-                slack_config['channel_id']
-            )
-            app_components['slack_client'] = slack_client
-            logger.info("✓ Slack client initialized")
+        slack_client = SlackClient(
+            token=config['slack_bot_token'],
+            channel_id=config['slack_channel_id']
+        )
+        logger.info("✓ Slack client initialized")
         
         # Initialize OpenAI client
-        openai_config = get_openai_config()
-        if not openai_config['api_key']:
-            logger.warning("⚠ OpenAI API key not configured")
-            app_components['openai_client'] = None
-        else:
-            openai_client = OpenAI(api_key=openai_config['api_key'])
-            app_components['openai_client'] = openai_client
-            logger.info("✓ OpenAI client initialized")
+        openai_client = OpenAI(api_key=config['openai_api_key'])
+        logger.info("✓ OpenAI client initialized")
         
-        # For instance, after slack_client is initialized:
-        theme_thread_id = setup_theme_thread(slack_client)  
-        if theme_thread_id:
-            logger.info(f"Theme thread ready: {theme_thread_id}")
+        # Set up theme thread with proper session management
+        with get_session() as session:
+            try:
+                setup_theme_thread(session, slack_client)
+            except Exception as e:
+                logger.error(f"Error setting up theme thread: {e}")
+                # Continue initialization even if theme setup fails
         
         logger.info("Application initialization complete")
-        return app_components
+        
+        components = {
+            'config': config,
+            'db_session': SessionMaker,
+            'slack_client': slack_client,
+            'openai_client': openai_client
+        }
+
+        global app_components
+        app_components.update(components)
+
+        return components
         
     except Exception as e:
         logger.error(f"Failed to initialize application: {e}")
@@ -339,8 +333,9 @@ def _process_event_with_error_handling(event, data):
             return {'statusCode': 200, 'body': 'Missing data'}
         
         # Check if this is the theme thread
-        if _is_theme_thread(thread_ts, channel):
-            return _handle_theme_update(user_id, text)
+        with get_session() as session:
+            if _is_theme_thread(thread_ts, channel,session):
+                return _handle_theme_update(user_id, text,session)
         
         # Process as vocabulary interaction
         # Extract event_id and message_ts for deduplication
@@ -370,22 +365,23 @@ def _process_event_with_error_handling(event, data):
 
 
 
-def _is_theme_thread(thread_ts, channel):
+def _is_theme_thread(thread_ts, channel,session):
     """Check if this is the theme settings thread"""
-    theme_thread_id = get_theme_thread_id()  # Ensure get_theme_thread_id() is defined/imported
+    theme_thread_id = get_theme_thread_id(session)  # Ensure get_theme_thread_id() is defined/imported
     return theme_thread_id and thread_ts == theme_thread_id
 
-def _handle_theme_update(user_id, text):
+def _handle_theme_update(user_id, text,session):
     """Process theme updates from the theme thread"""
     try:
         slack_client = app_components['slack_client']  # retrieve global instance
+        thread_id=get_theme_thread_id(session)
         with get_session() as session:
             handle_theme_update(
                 session=session,
                 user_id=user_id,
                 theme_text=text,
                 slack_client=slack_client,
-                thread_id=get_theme_thread_id()
+                thread_id=thread_id
             )
         return {'statusCode': 200, 'body': 'Theme updated'}
     except Exception as e:

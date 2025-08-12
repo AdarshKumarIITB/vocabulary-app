@@ -6,10 +6,10 @@ from database.models import (
     read_words, 
     get_word_by_name,
     create_word,
-    WordHistory
+    WordHistory,
+    get_current_theme
 )
 from .prompts import get_word_generation_prompt, get_system_prompt
-from database.models import get_current_theme
 import logging
 
 logger = logging.getLogger(__name__)
@@ -51,6 +51,7 @@ def generate_word(session):
 
         # Get current theme if set
         current_theme = get_current_theme(session)
+        theme_str = current_theme if current_theme else "Literature"
         if current_theme:
             logger.info(f"Generating word with theme: {current_theme}")
         
@@ -62,7 +63,7 @@ def generate_word(session):
                 existing_words=existing_words,
                 known_words=known_words,
                 unknown_words=unknown_words,
-                theme=current_theme 
+                theme=theme_str 
             )
             
             # Call LLM to generate word
