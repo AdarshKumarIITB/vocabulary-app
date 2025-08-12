@@ -295,10 +295,12 @@ def main():
         logger.info(f"Scheduled daily word posting at {daily_time}")
 
         # Start Flask server
-        logger.info("Starting webhook server on port 3000...")
+        import os
+        port = int(os.getenv('PORT', 3000))
+        logger.info("Starting webhook server on port ...")
         app.run(
             host='0.0.0.0',
-            port=3000,
+            port=port,
             debug=False,  # Never use debug=True in production
             threaded=True,  # Handle concurrent requests
             use_reloader=False  # Prevent double initialization

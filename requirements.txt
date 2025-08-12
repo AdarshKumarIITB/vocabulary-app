@@ -4,3 +4,4 @@ slack-sdk
 python-dotenv
 schedule
 flask
+psycopg2-binary
