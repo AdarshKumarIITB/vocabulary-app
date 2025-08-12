@@ -9,13 +9,16 @@ import time
 import threading
 import json
 from datetime import datetime
+from functools import wraps
 
-from config.settings import load_config, get_database_url, get_slack_config, get_openai_config, get_scheduler_config
+from config.settings import load_config, get_database_url, get_slack_config, get_openai_config, get_scheduler_config, get_theme_thread_id, set_theme_thread_id
 from database.database import create_engine_and_session, init_database, get_session
-from database.models import WordHistory, check_last_word_flag
+from database.models import WordHistory, check_last_word_flag, add_processed_event, check_event_processed, cleanup_old_events
 from slack_integration.slack_client import SlackClient
 from llm_backend.orchestrator import post_new_word_workflow, handle_user_interaction
 from openai import OpenAI
+from utils.cache import TTLCache, RateLimiter  # Ensure these exist
+from .orchestrator import handle_theme_update, setup_theme_thread
 
 logger = logging.getLogger(__name__)
 
@@ -28,6 +31,11 @@ app_components = {
     'scheduler_thread': None,
     'scheduler_stop_event': None
 }
+
+# Initialize caches and rate limiters
+event_cache = TTLCache(max_size=10000, ttl_seconds=3600)
+slack_rate_limiter = RateLimiter(max_calls=60, time_window=60)  # 60 calls per minute
+openai_rate_limiter = RateLimiter(max_calls=50, time_window=60)  # 50 calls per minute
 
 
 def initialize_application():
@@ -74,6 +82,11 @@ def initialize_application():
             openai_client = OpenAI(api_key=openai_config['api_key'])
             app_components['openai_client'] = openai_client
             logger.info("✓ OpenAI client initialized")
+        
+        # For instance, after slack_client is initialized:
+        theme_thread_id = setup_theme_thread(slack_client)  
+        if theme_thread_id:
+            logger.info(f"Theme thread ready: {theme_thread_id}")
         
         logger.info("Application initialization complete")
         return app_components
@@ -171,69 +184,220 @@ def stop_scheduler():
             logger.info("Scheduler stopped")
 
 
+def with_retry(max_retries=3, backoff_factor=2):
+    """Decorator for retry logic with exponential backoff"""
+    def decorator(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            last_exception = None
+            for attempt in range(max_retries):
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    last_exception = e
+                    if attempt < max_retries - 1:
+                        wait_time = backoff_factor ** attempt
+                        logger.warning(f"{func.__name__} failed (attempt {attempt + 1}/{max_retries}), "
+                                     f"retrying in {wait_time}s: {e}")
+                        time.sleep(wait_time)
+                    else:
+                        logger.error(f"{func.__name__} failed after {max_retries} attempts: {e}")
+            raise last_exception
+        return wrapper
+    return decorator
+
+
 def webhook_handler(request_data):
-    """
-    Processes incoming webhooks from Slack
-    """
+    """Enhanced webhook handler with comprehensive error handling"""
     try:
-        # Handle Slack URL verification challenge
-        if 'challenge' in request_data:
-            logger.info("Handling Slack URL verification challenge")
-            return {
-                'statusCode': 200,
-                'body': request_data['challenge']
-            }
+        # Parse request body
+        try:
+            data = json.loads(request_data) if isinstance(request_data, str) else request_data
+        except json.JSONDecodeError as e:
+            logger.error(f"Invalid JSON in webhook: {e}")
+            return {'statusCode': 400, 'body': 'Invalid JSON'}
         
-        # Parse the event
-        if 'event' not in request_data:
+        # Handle Slack URL verification
+        if data.get('type') == 'url_verification':
+            return {'statusCode': 200, 'body': data.get('challenge')}
+        
+        # Extract event
+        event = data.get('event', {})
+        if not event:
             logger.warning("No event in webhook payload")
-            return {'statusCode': 200, 'body': 'OK'}
+            return {'statusCode': 200, 'body': 'No event'}
         
-        event = request_data['event']
-        event_id = request_data.get("event_id")
-        message_ts = event.get("ts")
+        # Generate deduplication key
+        dedupe_key = _generate_dedupe_key(event, data)
+        if not dedupe_key:
+            logger.error("Could not generate deduplication key")
+            # Still process but log for monitoring
+            dedupe_key = f"fallback_{datetime.now().timestamp()}"
         
-        # Ignore bot messages to prevent loops
-        if event.get('bot_id') or event.get('subtype') == 'bot_message':
-            return {'statusCode': 200, 'body': 'Ignoring bot message'}
+        # Check if already processed (memory cache first, then DB)
+        if event_cache.contains(dedupe_key):
+            logger.debug(f"Event already processed (cache hit): {dedupe_key}")
+            return {'statusCode': 200, 'body': 'Already processed'}
         
-        # Check if it's a message event
-        if event.get('type') != 'message':
-            return {'statusCode': 200, 'body': 'Not a message event'}
-        
-        # Extract relevant information
-        thread_ts = event.get("thread_ts") or event.get("ts")
-        user_id = event.get("user")
-        message_text = event.get("text", "")
-        
-        if not user_id or not message_text:
-            return {'statusCode': 200, 'body': 'Missing user or text'}
-        
-        logger.info(f"Processing message from user {user_id} in thread {thread_ts}: {message_text}")
-        
-        # Route to orchestrator with deduplication parameters
-        if app_components['slack_client']:
+        # Check database for deduplication (with error handling)
+        try:
             with get_session() as session:
-                success = handle_user_interaction(
-                    session,
-                    app_components['slack_client'],
-                    thread_id=thread_ts,
-                    user_id=user_id,
-                    message=message_text,
-                    event_id=event_id,
-                    message_ts=message_ts,
-                )
-                
-                if success:
-                    logger.info("User interaction handled successfully")
-                else:
-                    logger.warning("Failed to handle user interaction")
-        else:
-            logger.warning("Slack client not configured, cannot handle interaction")
+                if check_event_processed(session, dedupe_key):
+                    logger.debug(f"Event already processed (DB hit): {dedupe_key}")
+                    event_cache.add(dedupe_key)  # Add to cache to avoid DB lookups
+                    return {'statusCode': 200, 'body': 'Already processed'}
+        except Exception as e:
+            logger.error(f"Database deduplication check failed: {e}")
+            # Continue processing even if DB check fails
         
-        return {'statusCode': 200, 'body': 'OK'}
+        # Rate limiting check
+        if not slack_rate_limiter.is_allowed():
+            wait_time = slack_rate_limiter.wait_time()
+            logger.warning(f"Rate limit exceeded, need to wait {wait_time}s")
+            return {'statusCode': 429, 'body': f'Rate limited. Retry after {wait_time}s'}
+        
+        # Process the event
+        try:
+            result = _process_event_with_error_handling(event, data)
+            
+            # Mark as processed after successful handling
+            event_cache.add(dedupe_key)
+            try:
+                with get_session() as session:
+                    add_processed_event(session, dedupe_key, event.get('type'))
+            except Exception as e:
+                logger.error(f"Failed to persist processed event to DB: {e}")
+                # Continue - cache will prevent reprocessing for TTL duration
+            
+            return result
+            
+        except Exception as e:
+            logger.error(f"Error processing event: {e}", exc_info=True)
+            # Don't mark as processed if there was an error
+            return {'statusCode': 500, 'body': 'Internal error'}
+            
+    except Exception as e:
+        logger.error(f"Unexpected error in webhook handler: {e}", exc_info=True)
+        return {'statusCode': 500, 'body': 'Internal server error'}
+
+def _generate_dedupe_key(event, data):
+    """Generate a deduplication key with multiple fallbacks"""
+    try:
+        # Priority 1: event_id (most reliable)
+        if event_id := data.get('event_id'):
+            return f"event_{event_id}"
+        
+        # Priority 2: client_msg_id for user messages
+        if client_msg_id := event.get('client_msg_id'):
+            return f"client_{client_msg_id}"
+        
+        # Priority 3: combination of ts + user/bot
+        if ts := event.get('ts'):
+            user_or_bot = event.get('user', event.get('bot_id', 'unknown'))
+            return f"ts_{ts}_{user_or_bot}"
+        
+        # Priority 4: event_time + type
+        if event_time := data.get('event_time'):
+            event_type = event.get('type', 'unknown')
+            return f"time_{event_time}_{event_type}"
+            
+        logger.warning("Could not generate reliable dedupe key")
+        return None
         
     except Exception as e:
-        logger.error(f"Error handling webhook: {e}")
-        # Still return 200 to prevent Slack retries
-        return {'statusCode': 200, 'body': 'Error processed'}
+        logger.error(f"Error generating dedupe key: {e}")
+        return None
+
+def _process_event_with_error_handling(event, data):
+    """Process event with comprehensive error handling"""
+    try:
+        event_type = event.get('type')
+        
+        # Skip bot messages
+        if event.get('bot_id'):
+            logger.debug("Skipping bot message")
+            return {'statusCode': 200, 'body': 'Bot message ignored'}
+        
+        # Handle only message events in threads
+        if event_type != 'message':
+            logger.debug(f"Ignoring non-message event: {event_type}")
+            return {'statusCode': 200, 'body': 'Not a message event'}
+        
+        # Check if it's a thread message
+        thread_ts = event.get('thread_ts')
+        if not thread_ts:
+            logger.debug("Not a thread message")
+            return {'statusCode': 200, 'body': 'Not in thread'}
+        
+        # Extract necessary information
+        user_id = event.get('user')
+        text = event.get('text', '').strip()
+        channel = event.get('channel')
+        
+        if not user_id or not text:
+            logger.warning(f"Missing user_id or text: user={user_id}, text={text}")
+            return {'statusCode': 200, 'body': 'Missing data'}
+        
+        # Check if this is the theme thread
+        if _is_theme_thread(thread_ts, channel):
+            return _handle_theme_update(user_id, text)
+        
+        # Process as vocabulary interaction
+        # Extract event_id and message_ts for deduplication
+        event_id = data.get('event_id', '')
+        message_ts = event.get('ts', '')
+
+        logger.debug(f"Processing vocabulary interaction: thread={thread_ts}, user={user_id}, text={text[:50]}")
+
+        
+        with get_session() as session:
+            # Call with ALL required parameters
+            handle_user_interaction(
+                session=session,
+                slack_client=app_components['slack_client'],
+                thread_id=thread_ts,
+                user_id=user_id,
+                message=text,
+                event_id=event_id,
+                message_ts=message_ts
+            )
+        
+        return {'statusCode': 200, 'body': 'Processed'}
+        
+    except Exception as e:
+        logger.error(f"Error in event processing: {e}", exc_info=True)
+        raise
+
+
+
+def _is_theme_thread(thread_ts, channel):
+    """Check if this is the theme settings thread"""
+    theme_thread_id = get_theme_thread_id()  # Ensure get_theme_thread_id() is defined/imported
+    return theme_thread_id and thread_ts == theme_thread_id
+
+def _handle_theme_update(user_id, text):
+    """Process theme updates from the theme thread"""
+    try:
+        slack_client = app_components['slack_client']  # retrieve global instance
+        with get_session() as session:
+            handle_theme_update(
+                session=session,
+                user_id=user_id,
+                theme_text=text,
+                slack_client=slack_client,
+                thread_id=get_theme_thread_id()
+            )
+        return {'statusCode': 200, 'body': 'Theme updated'}
+    except Exception as e:
+        logger.error(f"Error updating theme: {e}")
+        return {'statusCode': 500, 'body': 'Failed to update theme'}
+
+# Cleanup job to run periodically
+def cleanup_old_data():
+    """Clean up old processed events from database"""
+    try:
+        with get_session() as session:
+            cleanup_old_events(session, hours=24)
+        logger.info("Cleanup job completed successfully")
+    except Exception as e:
+        logger.error(f"Cleanup job failed: {e}")

@@ -1,346 +1,275 @@
 #!/usr/bin/env python3
 """
-Vocabulary Tutor - Production Application Entry Point
-Runs the complete application with Flask webhook server and scheduler
+Vocabulary Tutor Application Entry Point
+Production-ready with comprehensive error handling
 """
 
 import sys
-import os
-import logging
 import signal
-import argparse
-import json
-import hmac
-import hashlib
+import logging
+import threading
+import schedule
+import time
+from datetime import datetime
 from flask import Flask, request, jsonify
+from logging.handlers import RotatingFileHandler
+import io,os
 
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Import all components
+from config.settings import load_config
+from database.database import create_engine_and_session, init_database, test_connection
+from database.models import cleanup_old_events
+from llm_backend.main import initialize_application, webhook_handler, cleanup_old_data
+from llm_backend.orchestrator import schedule_daily_word, setup_theme_thread
 
-from config.settings import load_config, get_slack_config
-from database.database import create_engine_and_session, init_database, get_session
-from database.models import WordHistory, create_word, read_words, check_last_word_flag
-from slack_integration.slack_client import SlackClient
-from llm_backend.main import initialize_application, start_scheduler, stop_scheduler, webhook_handler
-from llm_backend.word_generator import generate_word
-from llm_backend.orchestrator import post_new_word_workflow
+# Setup logging
+def setup_logging():
+    """Configure comprehensive logging with Unicode support"""
+    # Fix for Windows console encoding issues
+    if sys.platform == 'win32':
+        # Set console to UTF-8
+        sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
+        sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8')
+    
+    # Create logs directory if it doesn't exist
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    
+    # Configure root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.INFO)
+    
+    # Console handler with UTF-8 encoding
+    console_handler = logging.StreamHandler(sys.stdout)
+    console_handler.setLevel(logging.INFO)
+    console_formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+    )
+    console_handler.setFormatter(console_formatter)
+    
+    # File handler with rotation and UTF-8 encoding
+    file_handler = RotatingFileHandler(
+        'logs/vocabulary_tutor.log',
+        maxBytes=10*1024*1024,  # 10MB
+        backupCount=5,
+        encoding='utf-8'
+    )
+    file_handler.setLevel(logging.DEBUG)
+    file_formatter = logging.Formatter(
+        '%(asctime)s - %(name)s - %(levelname)s - %(filename)s:%(lineno)d - %(message)s'
+    )
+    file_handler.setFormatter(file_formatter)
+    
+    # Error file handler with UTF-8 encoding
+    error_handler = RotatingFileHandler(
+        'logs/errors.log',
+        maxBytes=10*1024*1024,
+        backupCount=5,
+        encoding='utf-8'
+    )
+    error_handler.setLevel(logging.ERROR)
+    error_handler.setFormatter(file_formatter)
+    
+    # Add handlers
+    root_logger.addHandler(console_handler)
+    root_logger.addHandler(file_handler)
+    root_logger.addHandler(error_handler)
+    
+    return root_logger
 
-# Configure logging
-logging.basicConfig(
-    level=logging.INFO,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
+logger = setup_logging()
 
-# Flask application
+# Flask app for webhooks
 app = Flask(__name__)
-app_components = None
+app.config['JSON_SORT_KEYS'] = False
 
-
-def verify_slack_signature(request):
-    """Verify that the request came from Slack"""
-    slack_config = get_slack_config()
-    signing_secret = slack_config.get('signing_secret')
-    
-    if not signing_secret:
-        # If no signing secret configured, skip verification (dev mode)
-        logger.warning("No Slack signing secret configured - skipping verification")
-        return True
-    
-    timestamp = request.headers.get('X-Slack-Request-Timestamp', '')
-    signature = request.headers.get('X-Slack-Signature', '')
-    
-    if not timestamp or not signature:
-        return False
-    
-    # Check timestamp is recent (within 5 minutes)
-    import time
-    if abs(time.time() - float(timestamp)) > 60 * 5:
-        return False
-    
-    # Verify signature
-    sig_basestring = f"v0:{timestamp}:{request.get_data().decode('utf-8')}"
-    my_signature = 'v0=' + hmac.new(
-        signing_secret.encode(),
-        sig_basestring.encode(),
-        hashlib.sha256
-    ).hexdigest()
-    
-    return hmac.compare_digest(my_signature, signature)
-
+# Global variables for graceful shutdown
+shutdown_flag = threading.Event()
+scheduler_thread = None
+cleanup_thread = None
+app_components = {}
 
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint"""
-    return jsonify({
-        'status': 'healthy',
-        'service': 'vocabulary-tutor',
-        'timestamp': str(os.times())
-    }), 200
-
+    try:
+        # Check database connection
+        db_healthy = test_connection(app_components.get('engine'))
+        
+        # Check Slack connection (you could ping Slack API here)
+        slack_healthy = app_components.get('slack_client') is not None
+        
+        if db_healthy and slack_healthy:
+            return jsonify({
+                'status': 'healthy',
+                'timestamp': datetime.utcnow().isoformat(),
+                'components': {
+                    'database': 'healthy',
+                    'slack': 'healthy'
+                }
+            }), 200
+        else:
+            return jsonify({
+                'status': 'degraded',
+                'timestamp': datetime.utcnow().isoformat(),
+                'components': {
+                    'database': 'healthy' if db_healthy else 'unhealthy',
+                    'slack': 'healthy' if slack_healthy else 'unhealthy'
+                }
+            }), 503
+            
+    except Exception as e:
+        logger.error(f"Health check failed: {e}")
+        return jsonify({
+            'status': 'unhealthy',
+            'error': str(e)
+        }), 503
 
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
     """Webhook endpoint for Slack events"""
     try:
-        # Verify the request came from Slack
-        if not verify_slack_signature(request):
-            logger.warning("Invalid Slack signature")
-            return jsonify({'error': 'Invalid signature'}), 401
-        
         # Get request data
         request_data = request.get_json()
         
-        # Handle URL verification challenge
-        if request_data.get('type') == 'url_verification':
-            logger.info("Handling Slack URL verification")
-            return jsonify({'challenge': request_data['challenge']}), 200
+        # Log request for debugging (be careful with sensitive data)
+        logger.debug(f"Received webhook: {request_data.get('event', {}).get('type')}")
         
-        # Process the webhook
+        # Process with error handling
         result = webhook_handler(request_data)
         
-        # Return acknowledgment to Slack
-        return '', 200
+        # Return appropriate response
+        status_code = result.get('statusCode', 200)
+        body = result.get('body', 'OK')
         
-    except Exception as e:
-        logger.error(f"Error processing Slack event: {e}")
-        # Return 200 anyway to prevent Slack retries
-        return '', 200
-
-
-def test_database():
-    """Test database connection and operations"""
-    logger.info("\n=== TESTING DATABASE ===")
-    try:
-        engine, SessionMaker = create_engine_and_session()
-        init_database(engine)
-        
-        with get_session() as session:
-            # Test operations
-            count = session.query(WordHistory).count()
-            logger.info(f"✓ Database connected. Words in database: {count}")
-            
-            # Show last few words
-            recent_words = session.query(WordHistory).order_by(
-                WordHistory.timestamp.desc()
-            ).limit(5).all()
-            
-            if recent_words:
-                logger.info("Recent words:")
-                for word in recent_words:
-                    status = "Known" if word.known_flag == True else "Learning" if word.known_flag == False else "Pending"
-                    logger.info(f"  - {word.word}: {status}")
-            
-        return True
-    except Exception as e:
-        logger.error(f"✗ Database test failed: {e}")
-        return False
-
-
-def test_slack():
-    """Test Slack connection and posting"""
-    logger.info("\n=== TESTING SLACK ===")
-    try:
-        slack_config = get_slack_config()
-        
-        if not slack_config['bot_token']:
-            logger.warning("✗ Slack bot token not configured")
-            return False
-        
-        client = SlackClient(slack_config['bot_token'], slack_config['channel_id'])
-        
-        # Test by creating and deleting a test message
-        test_message = "🔧 Vocabulary Tutor test message (will be deleted)"
-        thread_id = client.create_thread(test_message)
-        
-        if thread_id:
-            logger.info(f"✓ Slack connected. Test thread created: {thread_id}")
-            # Note: In production, you might want to delete the test message
-            return True
+        if status_code == 200:
+            return body, 200
         else:
-            logger.error("✗ Failed to create test thread")
-            return False
+            return jsonify({'error': body}), status_code
             
     except Exception as e:
-        logger.error(f"✗ Slack test failed: {e}")
-        return False
+        logger.error(f"Webhook processing failed: {e}", exc_info=True)
+        return jsonify({'error': 'Internal server error'}), 500
 
-
-def test_word_generation():
-    """Test word generation with LLM"""
-    logger.info("\n=== TESTING WORD GENERATION ===")
-    try:
-        with get_session() as session:
-            result = generate_word(session)
-            
-            if result['status'] == 'success':
-                word_data = result['word_data']
-                logger.info(f"✓ Generated word: {word_data['word']}")
-                logger.info(f"  Meanings: {word_data['meanings'][0][:50]}...")
-                
-                # Clean up test word
-                word_entry = session.query(WordHistory).filter_by(
-                    word=word_data['word']
-                ).first()
-                if word_entry:
-                    session.delete(word_entry)
-                    session.commit()
-                
-                return True
-            else:
-                logger.warning(f"✗ Generation failed: {result.get('message')}")
-                return False
-                
-    except Exception as e:
-        logger.error(f"✗ Word generation test failed: {e}")
-        return False
-
-
-def test_workflow():
-    """Test the complete workflow"""
-    logger.info("\n=== TESTING FULL WORKFLOW ===")
-    try:
-        components = initialize_application()
-        
-        if not components['slack_client']:
-            logger.warning("Using mock Slack client for workflow test")
-            
-            class MockSlackClient:
-                def create_thread(self, message):
-                    logger.info(f"[MOCK] Thread: {message}")
-                    return "mock_thread_id"
-                
-                def post_to_thread(self, thread_id, message):
-                    logger.info(f"[MOCK] Reply: {message[:50]}...")
-                    return True
-                
-                def get_thread_messages(self, thread_id):
-                    return []
-            
-            slack_client = MockSlackClient()
-        else:
-            slack_client = components['slack_client']
-        
-        with get_session() as session:
-            success = post_new_word_workflow(session, slack_client)
-            
-            if success:
-                logger.info("✓ Workflow completed successfully")
-                
-                # Clean up if using mock
-                if isinstance(slack_client, type(lambda: None)):
-                    last_word = session.query(WordHistory).order_by(
-                        WordHistory.timestamp.desc()
-                    ).first()
-                    if last_word:
-                        session.delete(last_word)
-                        session.commit()
-                
-                return True
-            else:
-                logger.error("✗ Workflow failed")
-                return False
-                
-    except Exception as e:
-        logger.error(f"✗ Workflow test failed: {e}")
-        return False
-
-
-def run_production():
-    """Run the application in production mode"""
-    global app_components
+def run_scheduler():
+    """Run the scheduler in a separate thread"""
+    logger.info("Scheduler thread started")
     
-    logger.info("\n" + "="*60)
-    logger.info("VOCABULARY TUTOR - PRODUCTION MODE")
-    logger.info("="*60)
+    while not shutdown_flag.is_set():
+        try:
+            schedule.run_pending()
+            time.sleep(1)
+        except Exception as e:
+            logger.error(f"Scheduler error: {e}", exc_info=True)
+            time.sleep(5)  # Wait before retrying
+            
+    logger.info("Scheduler thread stopped")
+
+def run_cleanup():
+    """Run periodic cleanup tasks"""
+    logger.info("Cleanup thread started")
+    
+    while not shutdown_flag.is_set():
+        try:
+            # Run cleanup every hour
+            cleanup_old_data()
+            
+            # Sleep for an hour, but check shutdown flag every second
+            for _ in range(3600):
+                if shutdown_flag.is_set():
+                    break
+                time.sleep(1)
+                
+        except Exception as e:
+            logger.error(f"Cleanup error: {e}", exc_info=True)
+            time.sleep(300)  # Wait 5 minutes before retrying
+            
+    logger.info("Cleanup thread stopped")
+
+def handle_shutdown(signum, frame):
+    """Gracefully handle shutdown signals"""
+    logger.info(f"Received signal {signum}, initiating graceful shutdown...")
+    
+    # Set shutdown flag
+    shutdown_flag.set()
+    
+    # Wait for threads to finish (with timeout)
+    if scheduler_thread and scheduler_thread.is_alive():
+        scheduler_thread.join(timeout=5)
+        
+    if cleanup_thread and cleanup_thread.is_alive():
+        cleanup_thread.join(timeout=5)
+    
+    logger.info("Shutdown complete")
+    sys.exit(0)
+
+def main():
+    """Main entry point"""
+    global scheduler_thread, cleanup_thread, app_components
     
     try:
+        logger.info("=" * 50)
+        logger.info("Starting Vocabulary Tutor Application")
+        logger.info("=" * 50)
+        
         # Initialize all components
+        logger.info("Initializing application components...")
         app_components = initialize_application()
         
-        # Start the scheduler
-        if app_components['slack_client']:
-            start_scheduler()
-            logger.info("✓ Scheduler started")
+        if not app_components:
+            logger.error("Failed to initialize application")
+            sys.exit(1)
+            
+        # Setup theme thread
+        logger.info("Setting up theme thread...")
+        theme_thread_id = setup_theme_thread(app_components['slack_client'])
+        if theme_thread_id:
+            logger.info(f"Theme thread ready: {theme_thread_id}")
         else:
-            logger.warning("⚠ Slack not configured - scheduler not started")
+            logger.warning("Could not setup theme thread, continuing without it")
         
-        # Get port from environment or use default
-        port = int(os.environ.get('PORT', 3000))
+        # Setup signal handlers
+        signal.signal(signal.SIGINT, handle_shutdown)
+        signal.signal(signal.SIGTERM, handle_shutdown)
         
-        logger.info(f"\n🚀 Starting webhook server on port {port}")
-        logger.info(f"Webhook URL: http://localhost:{port}/slack/events")
-        logger.info(f"Health check: http://localhost:{port}/health")
-        logger.info("\nPress Ctrl+C to stop the server\n")
+        # Start scheduler thread
+        logger.info("Starting scheduler thread...")
+        scheduler_thread = threading.Thread(target=run_scheduler, daemon=False)
+        scheduler_thread.start()
         
-        # Run Flask server
+        # Start cleanup thread
+        logger.info("Starting cleanup thread...")
+        cleanup_thread = threading.Thread(target=run_cleanup, daemon=False)
+        cleanup_thread.start()
+        
+        # Schedule daily word posting
+        config = app_components['config']
+        daily_time = config.get('daily_word_time', '09:00')
+        schedule.every().day.at(daily_time).do(
+            lambda: schedule_daily_word(
+                app_components['db_session'],
+                app_components['slack_client']
+            )
+        )
+        logger.info(f"Scheduled daily word posting at {daily_time}")
+        
+        # Start Flask server
+        logger.info("Starting webhook server on port 3000...")
         app.run(
             host='0.0.0.0',
-            port=port,
-            debug=False,  # Set to False in production
-            use_reloader=False  # Prevents double initialization
+            port=3000,
+            debug=False,  # Never use debug=True in production
+            threaded=True,  # Handle concurrent requests
+            use_reloader=False  # Prevent double initialization
         )
         
     except KeyboardInterrupt:
-        logger.info("\nShutdown requested...")
+        logger.info("Received keyboard interrupt")
+        handle_shutdown(signal.SIGINT, None)
+        
     except Exception as e:
-        logger.error(f"Failed to start production server: {e}")
-        return 1
-    finally:
-        # Clean shutdown
-        stop_scheduler()
-        logger.info("Application stopped")
-    
-    return 0
-
-
-def main():
-    """Main entry point with argument parsing"""
-    parser = argparse.ArgumentParser(description='Vocabulary Tutor Application')
-    parser.add_argument(
-        '--mode',
-        choices=['production', 'test-db', 'test-slack', 'test-word', 'test-workflow'],
-        default='production',
-        help='Run mode (default: production)'
-    )
-    
-    args = parser.parse_args()
-    
-    # Header
-    logger.info("="*60)
-    logger.info("VOCABULARY TUTOR v1.0")
-    logger.info("="*60)
-    
-    # Execute based on mode
-    if args.mode == 'test-db':
-        return 0 if test_database() else 1
-    
-    elif args.mode == 'test-slack':
-        return 0 if test_slack() else 1
-    
-    elif args.mode == 'test-word':
-        initialize_application()
-        return 0 if test_word_generation() else 1
-    
-    elif args.mode == 'test-workflow':
-        return 0 if test_workflow() else 1
-    
-    else:  # production
-        return run_production()
-
-
-def handle_shutdown(signum, frame):
-    """Handle shutdown signals gracefully"""
-    logger.info("\nReceived shutdown signal")
-    stop_scheduler()
-    sys.exit(0)
-
+        logger.error(f"Fatal error in main: {e}", exc_info=True)
+        sys.exit(1)
 
 if __name__ == "__main__":
-    # Set up signal handlers
-    signal.signal(signal.SIGINT, handle_shutdown)
-    signal.signal(signal.SIGTERM, handle_shutdown)
-    
-    # Run main
-    exit_code = main()
-    sys.exit(exit_code)
+    main()

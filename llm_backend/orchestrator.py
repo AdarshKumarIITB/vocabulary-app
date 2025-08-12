@@ -7,10 +7,14 @@ from database.models import (
     get_word_by_thread,
     get_last_word,
     create_word,
-    WordHistory
+    WordHistory,
+    set_theme,
+    get_current_theme
 )
 from .word_generator import generate_word
 from .tutor import process_user_message
+from config.settings import get_theme_thread_id, set_theme_thread_id
+
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -24,42 +28,24 @@ def _make_dedupe_key(event_id: str | None, message_ts: str) -> str:
     return event_id if event_id else f"ts:{message_ts}"
 
 
-def schedule_daily_word(session, slack_client):
-    """
-    Sets up and runs scheduled job for daily word posting
-    Checks configuration for scheduled time (e.g., "09:00")
-    Before posting, verifies conditions are met:
-    - Checks if last word's known_flag is not None (user has responded)
-    - Ensures system is not in dormant state
-    If conditions met, triggers post_new_word_workflow
-    Logs scheduling activities and any issues
-    """
-    
-    logger.info(f"Daily word scheduling check initiated at {datetime.now()}")
-    
+def schedule_daily_word(session_maker, slack_client):
+    """Fixed version - session_maker is sessionmaker, need to create session"""
     try:
-        # Check if conditions are met for posting new word
-        last_word_flag = check_last_word_flag(session)
+        logger.info(f"Daily word scheduling check initiated at {datetime.now()}")
         
-        # System is dormant if last word hasn't been responded to
-        if last_word_flag is None and session.query(WordHistory).count() > 0:
-            logger.info("System in dormant state - waiting for user response to last word")
-            return False
-        
-        # Conditions met, post new word
-        logger.info("Conditions met for posting new word")
-        success = post_new_word_workflow(session, slack_client)
-        
-        if success:
-            logger.info("Successfully posted new daily word")
-        else:
-            logger.error("Failed to post daily word")
+        # Create actual session from sessionmaker
+        with session_maker() as session:
+            last_word_flag = check_last_word_flag(session)
             
-        return success
-        
+            if last_word_flag is None:
+                logger.info("Last word not responded to yet. Skipping new word generation.")
+                return
+            
+            # Generate and post new word
+            post_new_word_workflow(session, slack_client)
+            
     except Exception as e:
-        logger.error(f"Error in schedule_daily_word: {str(e)}", exc_info=True)
-        return False
+        logger.error(f"Error in schedule_daily_word: {e}", exc_info=True)
 
 
 def post_new_word_workflow(session, slack_client):
@@ -133,7 +119,7 @@ def post_new_word_workflow(session, slack_client):
         return False
 
 
-def handle_user_interaction(session, slack_client, thread_id, user_id, message, *, event_id: str | None, message_ts: str) -> bool:
+def handle_user_interaction(session, slack_client, thread_id, user_id, message, event_id=None, message_ts=None):
     """
     Central router for all user interactions in vocabulary threads
     Validates that message is from a user (not bot) and that this event hasn't been processed already.
@@ -146,7 +132,8 @@ def handle_user_interaction(session, slack_client, thread_id, user_id, message, 
         - Passes to tutor.process_user_message for handling
         - Posts tutor response back to thread
     Returns success/failure status
-    """
+    """        
+
     # ---- 0. Idempotency guard ---------------------------------------------
     dedupe_key = _make_dedupe_key(event_id, message_ts)
     logger.debug(f"Incoming Slack event dedupe_key={dedupe_key}")
@@ -160,6 +147,7 @@ def handle_user_interaction(session, slack_client, thread_id, user_id, message, 
     logger.debug(f"User {user_id} message: {message[:50]}...")
     
     try:
+        logger.info(f"Handling interaction from user {user_id} in thread {thread_id}")
         # Get the word associated with this thread
         word = get_word_by_thread(session, thread_id)
         
@@ -281,3 +269,104 @@ def update_word_status(session, thread_id, known_flag_value):
     Returns updated word object or None if not found
     """
     return update_known_flag_by_thread(session, thread_id, known_flag_value)
+
+
+def setup_theme_thread(slack_client):
+    """
+    Creates and pins the theme thread if it doesn't exist.
+    Should be called during application initialization.
+    """
+    try:
+        # Check if theme thread already exists
+        theme_thread_id = get_theme_thread_id()
+        
+        if not theme_thread_id:
+            # Create the theme thread
+            response = slack_client.create_thread(
+                "📚 **Theme Settings** - Reply here to set vocabulary theme"
+            )
+            theme_thread_id = response
+            
+            # Post instructions in the thread
+            instructions = (
+                "Reply to this thread to set the theme for your vocabulary words.\n"
+                "Examples:\n"
+                "• 'Technology' - for tech-related words\n"
+                "• 'Business' - for business vocabulary\n"
+                "• 'Literature' - for literary terms\n"
+                "• 'Science' - for scientific terminology\n"
+                "• 'Clear theme' - to remove theme preference\n\n"
+                "Your most recent reply will be used as the active theme. Default theme is 'Literature' for now."
+            )
+            slack_client.post_to_thread(theme_thread_id, instructions)
+            
+            # Pin the thread (requires chat:write.pin scope)
+            try:
+                slack_client.pin_message(theme_thread_id)
+            except Exception as e:
+                logger.warning(f"Could not pin theme thread: {e}")
+            
+            # Store the thread ID
+            set_theme_thread_id(theme_thread_id)
+            logger.info(f"Created theme thread: {theme_thread_id}")
+        else:
+            logger.info(f"Theme thread already exists: {theme_thread_id}")
+            
+        return theme_thread_id
+        
+    except Exception as e:
+        logger.error(f"Error setting up theme thread: {e}")
+        return None
+
+def handle_theme_update(session, user_id, theme_text, slack_client, thread_id):
+    """
+    Handles theme updates from the theme thread.
+    
+    Args:
+        session: Database session
+        user_id: Slack user ID
+        theme_text: The theme text from user
+        slack_client: Slack client for responses
+        thread_id: Thread ID to respond in
+    """
+    try:
+        # Clean and validate theme text
+        theme_text = theme_text.strip()
+        
+        # Check for clear theme command
+        if theme_text.lower() in ['clear theme', 'reset theme', 'no theme', 'remove theme']:
+            success = set_theme(session, None, user_id)
+            if success:
+                response = "✅ Theme cleared. Future words will be from general vocabulary."
+            else:
+                response = "❌ Failed to clear theme. Please try again after few minutes."
+        
+        # Validate theme length
+        elif len(theme_text) > 100:
+            response = "❌ Theme too long. Please keep it under 100 characters."
+        
+        # Set the new theme
+        else:
+            success = set_theme(session, theme_text, user_id)
+            if success:
+                response = f"✅ Theme set to: **{theme_text}**\nFuture vocabulary words will relate to this theme."
+            else:
+                response = "❌ Failed to set theme. Please try again."
+        
+        # Post response in thread
+        slack_client.post_to_thread(thread_id, response)
+        
+        # Log theme change
+        logger.info(f"Theme updated for user {user_id}: {theme_text}")
+        
+    except Exception as e:
+        logger.error(f"Error handling theme update: {e}")
+        slack_client.post_to_thread(
+            thread_id, 
+            "❌ An error occurred while updating the theme. Please try again."
+        )
+
+def is_theme_thread(thread_id):
+    """Check if a thread is the theme settings thread"""
+    theme_thread_id = get_theme_thread_id()
+    return theme_thread_id and thread_id == theme_thread_id

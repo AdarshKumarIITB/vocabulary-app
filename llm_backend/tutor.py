@@ -26,9 +26,13 @@ def process_user_message(session, thread_id, user_message, slack_client):
         
         # Fetch thread context
         thread_context = fetch_thread_context(slack_client, thread_id)
+
+        #Fetch theme
+        from database.models import get_current_theme
+        theme = get_current_theme(session)
         
         # Generate tutor response
-        response = generate_tutor_response(thread_context, user_message, word_entry.word)
+        response = generate_tutor_response(thread_context, user_message, word_entry.word, theme)
         
         logger.info(f"Generated response for word '{word_entry.word}'")
         return response
@@ -78,7 +82,7 @@ def fetch_thread_context(slack_client, thread_id):
         return ""
 
 
-def generate_tutor_response(thread_context, user_message, word):
+def generate_tutor_response(thread_context, user_message, word, theme=None):
     """
     Generates contextual tutor response for any user message
     Constructs prompt with full thread context and user's latest message
@@ -88,7 +92,7 @@ def generate_tutor_response(thread_context, user_message, word):
     """
     
     logger.debug(f"Generating tutor response for word '{word}'")
-    prompt = get_tutor_response_prompt(thread_context, user_message, word)
+    prompt = get_tutor_response_prompt(thread_context, user_message, word, theme)
     
     try:
         # Call LLM for response

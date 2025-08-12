@@ -1,0 +1,178 @@
+2025-08-12 04:42:57,056 - llm_backend.main - ERROR - main.py:95 - Failed to initialize application: name 'setup_theme_thread' is not defined
+2025-08-12 04:42:57,057 - root - ERROR - run.py:263 - Fatal error in main: name 'setup_theme_thread' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\run.py", line 209, in main
+    app_components = initialize_application()
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 87, in initialize_application
+    theme_thread_id = setup_theme_thread(slack_client)  # Ensure setup_theme_thread is defined/imported
+                      ^^^^^^^^^^^^^^^^^^
+NameError: name 'setup_theme_thread' is not defined. Did you mean: 'set_theme_thread_id'?
+2025-08-12 04:45:27,307 - database.database - ERROR - database.py:100 - Database session error: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:45:27,310 - llm_backend.main - ERROR - main.py:358 - Error in event processing: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:45:27,312 - llm_backend.main - ERROR - main.py:275 - Error processing event: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:45:28,917 - database.database - ERROR - database.py:100 - Database session error: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:45:28,919 - llm_backend.main - ERROR - main.py:358 - Error in event processing: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:45:28,921 - llm_backend.main - ERROR - main.py:275 - Error processing event: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:46:31,270 - database.database - ERROR - database.py:100 - Database session error: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:46:31,273 - llm_backend.main - ERROR - main.py:358 - Error in event processing: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:46:31,274 - llm_backend.main - ERROR - main.py:275 - Error processing event: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:51:32,213 - database.database - ERROR - database.py:100 - Database session error: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:51:32,219 - llm_backend.main - ERROR - main.py:358 - Error in event processing: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 04:51:32,222 - llm_backend.main - ERROR - main.py:275 - Error processing event: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 347, in _process_event_with_error_handling
+    handle_user_interaction(
+    ~~~~~~~~~~~~~~~~~~~~~~~^
+        session=session,
+        ^^^^^^^^^^^^^^^^
+    ...<3 lines>...
+        message=text
+        ^^^^^^^^^^^^
+    )
+    ^
+TypeError: handle_user_interaction() missing 2 required keyword-only arguments: 'event_id' and 'message_ts'
+2025-08-12 13:05:41,468 - llm_backend.orchestrator - ERROR - orchestrator.py:65 - Error in schedule_daily_word: 'sessionmaker' object has no attribute 'query'
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\orchestrator.py", line 46, in schedule_daily_word
+    last_word_flag = check_last_word_flag(session)
+  File "C:\Users\akrsa\Documents\vocabulary-app\database\models.py", line 173, in check_last_word_flag
+    last_word = session.query(WordHistory).order_by(WordHistory.timestamp.desc()).first()
+                ^^^^^^^^^^^^^
+AttributeError: 'sessionmaker' object has no attribute 'query'
+2025-08-12 15:29:21,654 - database.database - ERROR - database.py:100 - Database session error: name 'slack_client' is not defined
+2025-08-12 15:29:21,655 - llm_backend.main - ERROR - main.py:363 - Error in event processing: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 15:29:21,660 - llm_backend.main - ERROR - main.py:275 - Error processing event: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 15:29:22,847 - database.database - ERROR - database.py:100 - Database session error: name 'slack_client' is not defined
+2025-08-12 15:29:22,847 - llm_backend.main - ERROR - main.py:363 - Error in event processing: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 15:29:22,849 - llm_backend.main - ERROR - main.py:275 - Error processing event: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 15:30:24,249 - database.database - ERROR - database.py:100 - Database session error: name 'slack_client' is not defined
+2025-08-12 15:30:24,250 - llm_backend.main - ERROR - main.py:363 - Error in event processing: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?
+2025-08-12 15:30:24,251 - llm_backend.main - ERROR - main.py:275 - Error processing event: name 'slack_client' is not defined
+Traceback (most recent call last):
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 261, in webhook_handler
+    result = _process_event_with_error_handling(event, data)
+  File "C:\Users\akrsa\Documents\vocabulary-app\llm_backend\main.py", line 354, in _process_event_with_error_handling
+    slack_client=slack_client,
+                 ^^^^^^^^^^^^
+NameError: name 'slack_client' is not defined. Did you mean: 'SlackClient'?

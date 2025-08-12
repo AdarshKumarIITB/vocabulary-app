@@ -18,7 +18,14 @@ def get_word_generation_prompt(existing_words, known_words, unknown_words, theme
     difficulty_instruction="Generate words of the same difficulty level that the user had to learn. Should be above the level of words user already knew."
 
     # Theme instruction if provided
-    theme_instruction = f"\nThe word should be related to the theme: {theme}" if theme else ""
+    theme_instruction = f"""\nThe word should be related to the theme: {theme}
+    Examples of theme-appropriate words:
+    - Technology theme: algorithm, latency, deprecated, scalability
+    - Business theme: leverage, synergy, amortization, stakeholder  
+    - Literature theme: allegory, denouement, pastiche, verisimilitude
+    - Science theme: entropy, catalyst, osmosis, equilibrium
+
+    Make sure the word is genuinely connected to the theme, not just tangentially related.""" if theme else ""
     
     prompt = f"""You are a vocabulary tutor helping a user learn new English words. Your task is to generate a **new** vocabulary word for the user to learn.
 
@@ -52,7 +59,7 @@ Respond ONLY with a JSON object in this exact format:
     "examples": [
         "An example sentence using the word in context.",
         "Another example sentence showing different usage.",
-        "Another example sentence illustrating word in different context.
+        "Another example sentence illustrating word in different context."
     ]
 }}
 
@@ -63,7 +70,7 @@ Make sure the examples are clear and help illustrate the word's meaning."""
     return prompt
 
 
-def get_tutor_response_prompt(thread_context, user_message, word):
+def get_tutor_response_prompt(thread_context, user_message, word, theme=None):
     """
     Creates prompt for LLM to respond as vocabulary tutor
     Includes complete thread context for continuity
@@ -74,7 +81,7 @@ def get_tutor_response_prompt(thread_context, user_message, word):
     Returns formatted prompt string
     """
     
-    prompt = f"""You are a helpful vocabulary tutor engaged in a conversation about learning a new vocabulary word, "{word}". 
+    prompt = f"""You are a helpful vocabulary tutor engaged in a conversation about learning a new vocabulary word, "{word}" which is related to the theme "{theme}".
 
 Here is the conversation history:
 {thread_context}

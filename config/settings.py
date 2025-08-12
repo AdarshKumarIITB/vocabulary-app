@@ -135,3 +135,18 @@ def get_scheduler_config():
     }
     
     return scheduler_config
+
+
+def get_theme_thread_id():
+    """Get the thread ID for the pinned theme thread"""
+    # This should be set after creating the pinned theme thread
+    return os.getenv('THEME_THREAD_ID', None)
+
+
+def set_theme_thread_id(thread_id):
+    """Store the theme thread ID (call this after creating the pinned thread)"""
+    # You might want to store this in database instead of env variable
+    # For production, store in database as a system setting
+    with open('.env', 'a') as f:
+        f.write(f'\nTHEME_THREAD_ID={thread_id}\n')
+    return thread_id

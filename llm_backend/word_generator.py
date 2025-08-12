@@ -9,6 +9,11 @@ from database.models import (
     WordHistory
 )
 from .prompts import get_word_generation_prompt, get_system_prompt
+from database.models import get_current_theme
+import logging
+
+logger = logging.getLogger(__name__)
+
 
 
 def generate_word(session):
@@ -25,45 +30,53 @@ def generate_word(session):
     If duplicate, retries generation until unique word found
     Returns dictionary with word data structure for Slack posting
     """
-    
-    # Check if we should generate a new word
-    last_word_flag = check_last_word_flag(session)
-    
-    # If last word hasn't been responded to, don't generate new word
-    if last_word_flag is None and session.query(WordHistory).count() > 0:
-        return {
-            "status": "waiting",
-            "message": "Waiting for user response to last word before generating new one"
-        }
-    
-    # Get all existing words from database
-    all_words = read_words(session, known_flag=None)
-    existing_words = [word.word for word in all_words]
-    
-    # Separate into known and unknown words
-    known_words = [word.word for word in all_words if word.known_flag == True]
-    unknown_words = [word.word for word in all_words if word.known_flag == False]
-    
-    # Generate new word with retry logic for duplicates
-    max_retries = 5
-    for attempt in range(max_retries):
-        # Create prompt for word generation
-        prompt = get_word_generation_prompt(
-            existing_words=existing_words,
-            known_words=known_words,
-            unknown_words=unknown_words,
-            theme=None  # No theme for v1
-        )
+    try:
+        # Check if we should generate a new word
+        last_word_flag = check_last_word_flag(session)
         
-        # Call LLM to generate word
-        llm_response = call_llm_for_word(prompt)
+        # If last word hasn't been responded to, don't generate new word
+        if last_word_flag is None and session.query(WordHistory).count() > 0:
+            return {
+                "status": "waiting",
+                "message": "Waiting for user response to last word before generating new one"
+            }
         
-        # Parse the response
-        word_data = parse_word_response(llm_response)
+        # Get all existing words from database
+        all_words = read_words(session, known_flag=None)
+        existing_words = [word.word for word in all_words]
         
-        if word_data and "word" in word_data:
-            # Check if word is unique
+        # Separate into known and unknown words
+        known_words = [word.word for word in all_words if word.known_flag == True]
+        unknown_words = [word.word for word in all_words if word.known_flag == False]
+
+        # Get current theme if set
+        current_theme = get_current_theme(session)
+        if current_theme:
+            logger.info(f"Generating word with theme: {current_theme}")
+        
+        # Generate new word with retry logic for duplicates
+        max_retries = 5
+        for attempt in range(max_retries):
+            # Create prompt for word generation
+            prompt = get_word_generation_prompt(
+                existing_words=existing_words,
+                known_words=known_words,
+                unknown_words=unknown_words,
+                theme=current_theme 
+            )
+            
+            # Call LLM to generate word
+            llm_response = call_llm_for_word(prompt)
+            
+            # Parse the response
+            word_data = parse_word_response(llm_response)
+            
+
             if validate_word_uniqueness(session, word_data["word"]):
+                
+                logger.info(f"Generated unique word: {word_data['word']}")
+                if current_theme:
+                    word_data['theme'] = current_theme
 
                 # Prepare and return the word data for Slack
                 slack_messages = prepare_slack_messages(word_data)
@@ -75,13 +88,19 @@ def generate_word(session):
                 }
             else:
                 # Word is duplicate, retry
+                logger.warning(f"Generated duplicate word: {word_data['word']}. Retrying...")
+
                 if attempt < max_retries - 1:
                     continue
-    
-    return {
-        "status": "error",
-        "message": "Failed to generate unique word after multiple attempts"
-    }
+        
+        return {
+            "status": "error",
+            "message": "Failed to generate unique word after multiple attempts"
+        }
+    except Exception as e:
+        logger.error(f"Error generating word: {e}")
+        raise
+
 
 
 def call_llm_for_word(prompt):
@@ -246,7 +265,7 @@ def prepare_slack_messages(word_data):
     instruction = (
         "Did you already know this word?\n"
         "• Reply '1' if you already knew it\n"
-        "• Reply with any other message to learn it (you can ask questions or use it in a sentence)"
+        "• Reply with any other message to learn it (you can ask questions about the word or use it in a sentence for me to give feedback or ask for phonetic or syllable breakdown of the pronunciation)\n"
     )
     messages.append(instruction)
     

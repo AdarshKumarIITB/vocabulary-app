@@ -264,3 +264,54 @@ class SlackClient:
         except Exception as e:
             logger.error(f"Failed to parse webhook event: {str(e)}")
             return None
+        
+
+def pin_message(self, timestamp):
+    """
+    Pin a message in the channel.
+    Requires chat:write.pin scope.
+    """
+    try:
+        response = self.client.pins_add(
+            channel=self.channel_id,
+            timestamp=timestamp
+        )
+        logger.info(f"Pinned message: {timestamp}")
+        return True
+    except SlackApiError as e:
+        if e.response['error'] == 'already_pinned':
+            logger.info("Message already pinned")
+            return True
+        elif e.response['error'] == 'missing_scope':
+            logger.error("Missing chat:write.pin scope for pinning messages")
+            return False
+        else:
+            logger.error(f"Error pinning message: {e}")
+            return False
+
+def get_pinned_messages(self):
+    """Get all pinned messages in the channel"""
+    try:
+        response = self.client.pins_list(channel=self.channel_id)
+        return response.get('items', [])
+    except SlackApiError as e:
+        logger.error(f"Error getting pinned messages: {e}")
+        return []
+
+def find_theme_thread(self):
+    """
+    Find the theme thread by looking for pinned messages.
+    Returns thread_ts if found, None otherwise.
+    """
+    try:
+        pinned = self.get_pinned_messages()
+        for item in pinned:
+            if item.get('type') == 'message':
+                message = item.get('message', {})
+                # Look for our theme thread by checking message content
+                if 'Theme Settings' in message.get('text', ''):
+                    return message.get('ts')
+        return None
+    except Exception as e:
+        logger.error(f"Error finding theme thread: {e}")
+        return None
