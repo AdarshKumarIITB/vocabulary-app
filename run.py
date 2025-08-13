@@ -5,6 +5,7 @@ import threading
 import time
 import logging
 from flask import Flask, request, jsonify
+from waitress import serve
 
 from llm_backend.main import initialize_application, start_scheduler as start_main_scheduler, webhook_handler, stop_scheduler
 from slack_integration.slack_client import SlackClient
@@ -88,11 +89,8 @@ def main():
     logger.info(f"Starting webhook server on port {port}")
     
     # Start Flask app
-    app.run(
-        host='0.0.0.0',
-        port=port,
-        debug=False
-    )
+    serve(app, host="0.0.0.0", port=port)
+
 
 if __name__ == "__main__":
     main()

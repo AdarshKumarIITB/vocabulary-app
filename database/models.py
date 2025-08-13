@@ -28,9 +28,9 @@ def add_processed_event(session, event_key, event_type=None):
     Returns True if added successfully (new event), False if already exists.
     """
     try:
-        event = ProcessedEvent(event_key=event_key, event_type=event_type)
+        event = ProcessedEvent(event_key=event_key, event_type=event_type, processed_at=datetime.utcnow())
         session.add(event)
-        session.commit()
+        session.flush() # <-- attempt the insert NOW
         return True
     except IntegrityError:
         # Event already processed
