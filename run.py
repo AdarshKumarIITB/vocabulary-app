@@ -2,13 +2,11 @@ import os
 import signal
 import sys
 import threading
-import time
 import logging
 from flask import Flask, request, jsonify
 
 from config.settings import load_config
 from database.database import create_engine_and_session, init_database
-from llm_backend.main import initialize_application
 from llm_backend.orchestrator import schedule_daily_word, handle_user_interaction
 from slack_integration.slack_client import SlackClient
 
@@ -19,15 +17,18 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Global variables
+# Flask app
 app = Flask(__name__)
+
+# Global variables (will be initialized)
 session_maker = None
 slack_client = None
 scheduler_thread = None
+config = None
 
-def initialize_app():
+def initialize_components():
     """Initialize all application components"""
-    global session_maker, slack_client
+    global session_maker, slack_client, config
     
     try:
         # Load configuration
@@ -52,8 +53,8 @@ def initialize_app():
         logger.error(f"Failed to initialize application: {e}")
         return False
 
-def start_scheduler():
-    """Start the daily word scheduler"""
+def start_background_scheduler():
+    """Start the daily word scheduler in background thread"""
     global scheduler_thread
     
     try:
@@ -122,28 +123,38 @@ def handle_shutdown(signum, frame):
     logger.info("Application shutdown complete")
     sys.exit(0)
 
-def main():
-    """Main application entry point"""
-    logger.info("Starting Vocabulary Tutor application...")
+# Initialize application components when imported by Gunicorn
+def create_app():
+    """Application factory for Gunicorn"""
+    logger.info("Creating Vocabulary Tutor application...")
     
+    # Initialize components
+    if not initialize_components():
+        logger.error("Application initialization failed")
+        raise RuntimeError("Failed to initialize application")
+    
+    # Start scheduler
+    start_background_scheduler()
+    
+    logger.info("Application created successfully")
+    return app
+
+# For Gunicorn: create app instance
+app = create_app()
+
+def main():
+    """Main entry point for development server"""
     # Set up signal handlers for graceful shutdown
     signal.signal(signal.SIGINT, handle_shutdown)
     signal.signal(signal.SIGTERM, handle_shutdown)
     
-    # Initialize application
-    if not initialize_app():
-        logger.error("Application initialization failed")
-        sys.exit(1)
-    
-    # Start scheduler
-    start_scheduler()
-    
-    # Get port from environment (Railway sets this)
+    # Get port from environment
     port = int(os.environ.get('PORT', 3000))
     
-    logger.info(f"Starting webhook server on port {port}")
+    logger.info(f"Starting development server on port {port}")
+    logger.warning("Using Flask development server - not suitable for production!")
     
-    # Start Flask app
+    # Start Flask app (development only)
     app.run(
         host='0.0.0.0',
         port=port,
