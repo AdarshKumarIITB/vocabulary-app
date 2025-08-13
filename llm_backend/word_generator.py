@@ -118,13 +118,15 @@ def call_llm_for_word(prompt):
     
     from config.settings import get_openai_config
     openai_config = get_openai_config()
+
     api_key = openai_config['api_key']
     
     if not api_key or api_key == "your_api_key_here":
         raise ValueError("OpenAI API key not configured. Please set OPENAI_API_KEY in .env file")
     
     # Initialize OpenAI client
-    client = OpenAI(api_key=api_key)
+    from llm_backend.main import app_components
+    client = app_components['openai_client']
     
     # Retry logic with exponential backoff
     max_retries = 3

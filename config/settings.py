@@ -138,9 +138,6 @@ def get_scheduler_config():
     
     return scheduler_config
 
-def get_theme_thread_id(session):
-    """Get the thread ID for the pinned theme thread from database"""
-    return get_system_setting(session, 'theme_thread_id')
 
 def set_theme_thread_id(session, thread_id):
     """Store the theme thread ID in database"""

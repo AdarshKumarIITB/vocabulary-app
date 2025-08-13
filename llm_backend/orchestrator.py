@@ -1,4 +1,5 @@
 import logging
+import threading
 from datetime import datetime
 from database.models import (
     update_known_flag, 
@@ -12,18 +13,17 @@ from database.models import (
     get_current_theme, 
     clear_all_data,
     SystemSettings,
-    UserTheme
+    UserTheme,
+    get_system_setting
 )
 from .word_generator import generate_word
 from .tutor import process_user_message
-from config.settings import get_theme_thread_id, set_theme_thread_id
+from config.settings import set_theme_thread_id
 
+_POST_WORD_LOCK = threading.Lock()
 
 # Set up logging
 logger = logging.getLogger(__name__)
-
-# In-memory cache for deduplication of processed Slack events.
-_processed_event_ids: set[str] = set()
 
 
 def _make_dedupe_key(event_id: str | None, message_ts: str) -> str:
@@ -32,7 +32,7 @@ def _make_dedupe_key(event_id: str | None, message_ts: str) -> str:
 
 
 def schedule_daily_word(session_maker, slack_client):
-    """Fixed version - session_maker is sessionmaker, need to create session"""
+    """Daily word scheduler, is passed session_maker and slack_client from run.py"""
     try:
         logger.info(f"Daily word scheduling check initiated at {datetime.now()}")
         
@@ -64,62 +64,62 @@ def post_new_word_workflow(session, slack_client):
     Returns False and rolls back if any step fails
     Ensures database stays in sync with Slack posts
     """
-    
-    logger.info("Starting post_new_word_workflow")
-    thread_id = None
-    
-    try:
-        # Step 1: Generate new word
-        logger.debug("Generating new word")
-        word_result = generate_word(session)
+    with _POST_WORD_LOCK:
+        logger.info("Starting post_new_word_workflow")
+        thread_id = None
         
-        if word_result["status"] == "waiting":
-            # System is in dormant state, no new word needed
-            logger.info("System in dormant state - no new word needed")
-            return False
-        
-        if word_result["status"] != "success":
-            # Failed to generate word
-            logger.error(f"Failed to generate word: {word_result.get('message', 'Unknown error')}")
-            return False
-        
-        word_data = word_result["word_data"]
-        slack_messages = word_result["slack_messages"]
-        
-        logger.info(f"Generated word: {word_data['word']}")
-        
-        # Step 2: Create new thread with main message
-        logger.debug("Creating Slack thread")
-        thread_id = slack_client.create_thread(slack_messages[0])
-        
-        if not thread_id:
-            logger.error("Failed to create Slack thread")
-            session.rollback()
-            return False
-        
-        logger.info(f"Created thread with ID: {thread_id}")
-        
-        # Step 3-5: Post replies in order
-        for i, message in enumerate(slack_messages[1:], 1):
-            logger.debug(f"Posting reply {i} to thread")
-            success = slack_client.post_to_thread(thread_id, message)
-            if not success:
-                logger.error(f"Failed to post message {i} to thread")
+        try:
+            # Step 1: Generate new word
+            logger.debug("Generating new word")
+            word_result = generate_word(session)
+            
+            if word_result["status"] == "waiting":
+                # System is in dormant state, no new word needed
+                logger.info("System in dormant state - no new word needed")
+                return False
+            
+            if word_result["status"] != "success":
+                # Failed to generate word
+                logger.error(f"Failed to generate word: {word_result.get('message', 'Unknown error')}")
+                return False
+            
+            word_data = word_result["word_data"]
+            slack_messages = word_result["slack_messages"]
+            
+            logger.info(f"Generated word: {word_data['word']}")
+            
+            # Step 2: Create new thread with main message
+            logger.debug("Creating Slack thread")
+            thread_id = slack_client.create_thread(slack_messages[0])
+            
+            if not thread_id:
+                logger.error("Failed to create Slack thread")
                 session.rollback()
                 return False
-        
-        # Step 6: All Slack posts successful, save to database with thread_id
-        logger.debug("Saving word to database with thread_id")
-        new_word = create_word(session, word_data["word"], thread_id=thread_id)
-        session.commit()
-        
-        logger.info(f"Successfully posted word '{word_data['word']}' with thread_id '{thread_id}'")
-        return True
-        
-    except Exception as e:
-        logger.error(f"Error in post_new_word_workflow: {str(e)}", exc_info=True)
-        session.rollback()
-        return False
+            
+            logger.info(f"Created thread with ID: {thread_id}")
+            
+            # Step 3-5: Post replies in order
+            for i, message in enumerate(slack_messages[1:], 1):
+                logger.debug(f"Posting reply {i} to thread")
+                success = slack_client.post_to_thread(thread_id, message)
+                if not success:
+                    logger.error(f"Failed to post message {i} to thread")
+                    session.rollback()
+                    return False
+            
+            # Step 6: All Slack posts successful, save to database with thread_id
+            logger.debug("Saving word to database with thread_id")
+            new_word = create_word(session, word_data["word"], thread_id=thread_id)
+            session.commit()
+            
+            logger.info(f"Successfully posted word '{word_data['word']}' with thread_id '{thread_id}'")
+            return True
+            
+        except Exception as e:
+            logger.error(f"Error in post_new_word_workflow: {str(e)}", exc_info=True)
+            session.rollback()
+            return False
 
 
 def handle_user_interaction(session, slack_client, thread_id, user_id, message, event_id=None, message_ts=None):
@@ -136,15 +136,6 @@ def handle_user_interaction(session, slack_client, thread_id, user_id, message, 
         - Posts tutor response back to thread
     Returns success/failure status
     """        
-
-    # ---- 0. Idempotency guard ---------------------------------------------
-    dedupe_key = _make_dedupe_key(event_id, message_ts)
-    logger.debug(f"Incoming Slack event dedupe_key={dedupe_key}")
-
-    if dedupe_key in _processed_event_ids:
-        logger.debug(f"Duplicate Slack event {dedupe_key}; ignoring.")
-        return True
-    _processed_event_ids.add(dedupe_key)
     
     logger.info(f"Handling user interaction in thread {thread_id}")
     logger.debug(f"User {user_id} message: {message[:50]}...")
@@ -375,7 +366,7 @@ def handle_theme_update(session, user_id, theme_text, slack_client, thread_id):
 
 def is_theme_thread(session, thread_id):
     """Check if a thread is the theme settings thread"""
-    theme_thread_id = get_theme_thread_id(session)
+    theme_thread_id = get_system_setting(session,'theme_thread_id')
     return theme_thread_id and thread_id == theme_thread_id
 
 def initialize_fresh_database(session, slack_client):

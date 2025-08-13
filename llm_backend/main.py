@@ -11,9 +11,9 @@ import json
 from datetime import datetime
 from functools import wraps
 
-from config.settings import load_config, get_database_url, get_slack_config, get_openai_config, get_scheduler_config, get_theme_thread_id, set_theme_thread_id
+from config.settings import load_config, get_database_url, get_slack_config, get_openai_config, get_scheduler_config, set_theme_thread_id
 from database.database import create_engine_and_session, init_database, get_session
-from database.models import WordHistory, check_last_word_flag, add_processed_event, check_event_processed, cleanup_old_events
+from database.models import WordHistory, check_last_word_flag, add_processed_event, check_event_processed, cleanup_old_events, get_system_setting
 from slack_integration.slack_client import SlackClient
 from llm_backend.orchestrator import post_new_word_workflow, handle_user_interaction
 from openai import OpenAI
@@ -200,79 +200,83 @@ def with_retry(max_retries=3, backoff_factor=2):
         return wrapper
     return decorator
 
-
 def webhook_handler(request_data):
-    """Enhanced webhook handler with comprehensive error handling"""
+    """
+    ACK-first Slack webhook handler.
+    - Parse the payload.
+    - Generate a reliable dedupe key.
+    - Drop duplicates fast (memory cache).
+    - CLAIM the event in DB (unique insert) before doing any heavy work.
+    - Start a background thread to process the event.
+    - Immediately return 200 to Slack so it doesn't retry.
+    """
     try:
-        # Parse request body
+        # 1) Parse request body safely
         try:
             data = json.loads(request_data) if isinstance(request_data, str) else request_data
         except json.JSONDecodeError as e:
             logger.error(f"Invalid JSON in webhook: {e}")
             return {'statusCode': 400, 'body': 'Invalid JSON'}
-        
-        # Handle Slack URL verification
+
+        # 2) Slack URL verification handshake
         if data.get('type') == 'url_verification':
             return {'statusCode': 200, 'body': data.get('challenge')}
-        
-        # Extract event
+
+        # 3) Pull out the actual event
         event = data.get('event', {})
         if not event:
             logger.warning("No event in webhook payload")
             return {'statusCode': 200, 'body': 'No event'}
-        
-        # Generate deduplication key
+
+        # 4) Build a dedupe key (event_id > client_msg_id > ts+user > fallback)
         dedupe_key = _generate_dedupe_key(event, data)
         if not dedupe_key:
             logger.error("Could not generate deduplication key")
-            # Still process but log for monitoring
             dedupe_key = f"fallback_{datetime.now().timestamp()}"
-        
-        # Check if already processed (memory cache first, then DB)
+
+        # 5) Fast in-memory duplicate drop (cheap + thread-safe TTL cache)
         if event_cache.contains(dedupe_key):
             logger.debug(f"Event already processed (cache hit): {dedupe_key}")
             return {'statusCode': 200, 'body': 'Already processed'}
-        
-        # Check database for deduplication (with error handling)
+
+        # 6) CLAIM in DB *before* doing any heavy work.
+        #    add_processed_event() returns True if we inserted (i.e., we own it),
+        #    False if a duplicate key already exists (someone else is/was processing).
+        claimed = False
         try:
             with get_session() as session:
-                if check_event_processed(session, dedupe_key):
-                    logger.debug(f"Event already processed (DB hit): {dedupe_key}")
-                    event_cache.add(dedupe_key)  # Add to cache to avoid DB lookups
-                    return {'statusCode': 200, 'body': 'Already processed'}
+                claimed = add_processed_event(session, dedupe_key, event.get('type'))
         except Exception as e:
-            logger.error(f"Database deduplication check failed: {e}")
-            # Continue processing even if DB check fails
-        
-        # Rate limiting check
-        if not slack_rate_limiter.is_allowed():
-            wait_time = slack_rate_limiter.wait_time()
-            logger.warning(f"Rate limit exceeded, need to wait {wait_time}s")
-            return {'statusCode': 429, 'body': f'Rate limited. Retry after {wait_time}s'}
-        
-        # Process the event
-        try:
-            result = _process_event_with_error_handling(event, data)
-            
-            # Mark as processed after successful handling
+            # If DB is down for a moment, don't crash the webhook; rely on cache only.
+            logger.error(f"DB claim failed (continuing with cache claim): {e}")
+
+        if not claimed:
+            # Another request already claimed this event; mark cache and ACK.
             event_cache.add(dedupe_key)
+            return {'statusCode': 200, 'body': 'Already processed'}
+
+        # 7) Put into cache so parallel workers in this process immediately drop it.
+        event_cache.add(dedupe_key)
+
+        # 8) Do the heavy work in the background so we can ACK fast.
+        def _worker():
             try:
-                with get_session() as session:
-                    add_processed_event(session, dedupe_key, event.get('type'))
+                # Note: we moved any Slack rate limiting checks into the worker
+                # (do NOT 429 the webhook — Slack will retry).
+                _process_event_with_error_handling(event, data)
             except Exception as e:
-                logger.error(f"Failed to persist processed event to DB: {e}")
-                # Continue - cache will prevent reprocessing for TTL duration
-            
-            return result
-            
-        except Exception as e:
-            logger.error(f"Error processing event: {e}", exc_info=True)
-            # Don't mark as processed if there was an error
-            return {'statusCode': 500, 'body': 'Internal error'}
-            
+                logger.error(f"Background event processing failed: {e}", exc_info=True)
+                # We already claimed the event; don't un-claim it. Failures are logged.
+
+        threading.Thread(target=_worker, daemon=True).start()
+
+        # 9) IMPORTANT: return 200 immediately so Slack doesn't retry.
+        return {'statusCode': 200, 'body': 'Accepted'}
+
     except Exception as e:
         logger.error(f"Unexpected error in webhook handler: {e}", exc_info=True)
         return {'statusCode': 500, 'body': 'Internal server error'}
+
 
 def _generate_dedupe_key(event, data):
     """Generate a deduplication key with multiple fallbacks"""
@@ -332,6 +336,12 @@ def _process_event_with_error_handling(event, data):
             logger.warning(f"Missing user_id or text: user={user_id}, text={text}")
             return {'statusCode': 200, 'body': 'Missing data'}
         
+        # Slack rate limiting check
+        if not slack_rate_limiter.is_allowed():
+            wait = slack_rate_limiter.wait_time()
+            logger.warning(f"Slack rate limited; sleeping {wait}s")
+            time.sleep(wait)
+        
         # Check if this is the theme thread
         with get_session() as session:
             if _is_theme_thread(thread_ts, channel,session):
@@ -367,21 +377,21 @@ def _process_event_with_error_handling(event, data):
 
 def _is_theme_thread(thread_ts, channel,session):
     """Check if this is the theme settings thread"""
-    theme_thread_id = get_theme_thread_id(session)  # Ensure get_theme_thread_id() is defined/imported
+    theme_thread_id = get_system_setting(session,'theme_thread_id')  # Ensure get_theme_thread_id() is defined/imported
     return theme_thread_id and thread_ts == theme_thread_id
 
 def _handle_theme_update(user_id, text,session):
     """Process theme updates from the theme thread"""
     try:
         slack_client = app_components['slack_client']  # retrieve global instance
-        thread_id=get_theme_thread_id(session)
+        theme_thread_id=get_system_setting(session,'theme_thread_id')
         with get_session() as session:
             handle_theme_update(
                 session=session,
                 user_id=user_id,
                 theme_text=text,
                 slack_client=slack_client,
-                thread_id=thread_id
+                thread_id=theme_thread_id
             )
         return {'statusCode': 200, 'body': 'Theme updated'}
     except Exception as e:

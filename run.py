@@ -6,10 +6,7 @@ import time
 import logging
 from flask import Flask, request, jsonify
 
-from config.settings import load_config
-from database.database import create_engine_and_session, init_database
-from llm_backend.main import initialize_application
-from llm_backend.orchestrator import schedule_daily_word, handle_user_interaction
+from llm_backend.main import initialize_application, start_scheduler as start_main_scheduler, webhook_handler, stop_scheduler
 from slack_integration.slack_client import SlackClient
 
 # Configure logging
@@ -24,47 +21,26 @@ app = Flask(__name__)
 session_maker = None
 slack_client = None
 scheduler_thread = None
+openai_client = None
 
 def initialize_app():
     """Initialize all application components"""
-    global session_maker, slack_client
+    global session_maker, slack_client, openai_client
     
     try:
-        # Load configuration
-        config = load_config()
-        logger.info("Configuration loaded successfully")
-        
-        # Initialize database
-        engine, session_maker = create_engine_and_session()
-        init_database(engine)
-        logger.info("Database initialized successfully")
-        
-        # Initialize Slack client
-        slack_client = SlackClient(
-            token=config['slack_bot_token'],
-            channel_id=config['slack_channel_id']
-        )
-        logger.info("Slack client initialized successfully")
-        
+        components = initialize_application()
+        slack_client = components['slack_client']
+        session_maker = components['db_session']
+        openai_client = components['openai_client']
         return True
-        
     except Exception as e:
         logger.error(f"Failed to initialize application: {e}")
         return False
 
 def start_scheduler():
-    """Start the daily word scheduler"""
-    global scheduler_thread
-    
+    """Start the daily word scheduler from main.py"""
     try:
-        scheduler_thread = threading.Thread(
-            target=schedule_daily_word,
-            args=(session_maker, slack_client),
-            daemon=True
-        )
-        scheduler_thread.start()
-        logger.info("Daily word scheduler started")
-        
+        start_main_scheduler()    
     except Exception as e:
         logger.error(f"Failed to start scheduler: {e}")
 
@@ -75,39 +51,10 @@ def health_check():
 
 @app.route('/slack/events', methods=['POST'])
 def slack_events():
-    """Handle Slack webhook events"""
+    """Handle Slack webhook events using main.py webhook_handler"""
     try:
-        data = request.get_json()
-        
-        # Handle URL verification challenge
-        if data.get("type") == "url_verification":
-            return jsonify({"challenge": data.get("challenge")})
-        
-        # Handle events
-        if data.get("type") == "event_callback":
-            event = data.get("event", {})
-            
-            # Only process message events in threads
-            if (event.get("type") == "message" and 
-                event.get("thread_ts") and 
-                not event.get("bot_id")):
-                
-                thread_id = event.get("thread_ts")
-                user_id = event.get("user")
-                message = event.get("text", "")
-                
-                # Handle the interaction
-                with session_maker() as session:
-                    handle_user_interaction(
-                        session=session,
-                        slack_client=slack_client,
-                        thread_id=thread_id,
-                        user_id=user_id,
-                        message=message
-                    )
-        
-        return jsonify({"status": "ok"}), 200
-        
+        result = webhook_handler(request.get_json())
+        return jsonify(result.get('body', {})), result.get('statusCode', 200)
     except Exception as e:
         logger.error(f"Error handling Slack event: {e}")
         return jsonify({"error": "Internal server error"}), 500
@@ -115,10 +62,7 @@ def slack_events():
 def handle_shutdown(signum, frame):
     """Gracefully handle application shutdown"""
     logger.info("Received shutdown signal, cleaning up...")
-    
-    if scheduler_thread and scheduler_thread.is_alive():
-        logger.info("Stopping scheduler...")
-    
+    stop_scheduler()
     logger.info("Application shutdown complete")
     sys.exit(0)
 

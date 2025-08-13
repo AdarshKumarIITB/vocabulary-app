@@ -118,7 +118,8 @@ def call_llm_for_tutoring(prompt):
     try:
         # Get OpenAI configuration
         config = get_openai_config()
-        client = OpenAI(api_key=config['api_key'])
+        from llm_backend.main import app_components
+        client = app_components['openai_client']
         
         # Make API call with conversational parameters
         response = client.chat.completions.create(
